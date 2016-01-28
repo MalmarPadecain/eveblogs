@@ -14,26 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.eveblogs.ServerApp;
+package de.eveblogs.ServerApp.Utilities;
 
 /**
- *
+ * A class representing a blogpost. It contains methods to create a blogpost from the database, write a blogpost to the database and manipualating a blogpost in the database.
  * @author Malmar Padecain
  */
-public class EveBlogs {
-
-    /**
-     *
-     * @param args the comand line arguments. "-fetch" to fetch the RSS feeds without creating new feed. "-create" to create a new feed without fetching first.
-     */
-    public static void main(String[] args) {
-        if(args.length > 0) {
-            String arg = args[0];
-            switch(arg) {
-                case "-fetch": break;
-                case "-create": break;
-            }
-        }
-        //Code to execute if no argument is given. 
-    }
+public class Blogpost {
+    
 }

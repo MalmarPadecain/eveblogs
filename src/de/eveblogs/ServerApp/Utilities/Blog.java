@@ -14,26 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.eveblogs.ServerApp;
+package de.eveblogs.ServerApp.Utilities;
 
 /**
- *
+ * This class represents a blog. It contains methods to create a blog from the database, write a blog to the database and manipualating a blog in the database.
  * @author Malmar Padecain
  */
-public class EveBlogs {
-
-    /**
-     *
-     * @param args the comand line arguments. "-fetch" to fetch the RSS feeds without creating new feed. "-create" to create a new feed without fetching first.
-     */
-    public static void main(String[] args) {
-        if(args.length > 0) {
-            String arg = args[0];
-            switch(arg) {
-                case "-fetch": break;
-                case "-create": break;
-            }
-        }
-        //Code to execute if no argument is given. 
+public class Blog extends DatabaseObject{
+    
+    public Blog(int primaryKey, Status status) {
+        super(primaryKey, status);
     }
+
+    @Override
+    public void writeToDatabase() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void deleteFromDatabase() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }
