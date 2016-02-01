@@ -16,14 +16,117 @@
  */
 package de.eveblogs.ServerApp.Utilities;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
- * This class represents a blog. It contains methods to create a blog from the database, write a blog to the database and manipualating a blog in the database.
+ * This class represents a blog. It contains methods to create a blog from the
+ * database, write a blog to the database and manipualating a blog in the
+ * database.
+ *
  * @author Malmar Padecain
  */
-public class Blog extends DatabaseObject{
-    
-    public Blog(int primaryKey, Status status) {
-        super(primaryKey, status);
+public class Blog extends DatabaseObject {
+
+    private URL blogURL;
+    private URL feedURL;
+    private String name;
+    private String author;
+
+    /**
+     * Creates a new representation of a blog from the data base. StatusFlag
+     * will be ORIGINAL.
+     *
+     * @param primaryKey the primary key of the blog in the data base.
+     */
+    public Blog(int primaryKey) {
+        super(primaryKey);
+    }
+
+    /**
+     * Creates a new Blog. The statusFlag will be NEW and the primary key null.
+     *
+     * @param name the name of the blog.
+     * @param author the author of the blog. Preferably an email address.
+     * @param blogURL string representation of the URL of the blog.
+     * @param feedURL string representation of the URL of the RSS feed.
+     * @throws MalformedURLException if the given strings could not be parsed to
+     * URLs.
+     */
+    public Blog(String name, String author, String blogURL, String feedURL) throws MalformedURLException {
+        super();
+        this.name = name;
+        this.author = author;
+        this.blogURL = new URL(blogURL);
+        this.feedURL = new URL(feedURL);
+    }
+
+    /**
+     *
+     * @return the URL of the blog.
+     */
+    public URL getBlogURL() {
+        return blogURL;
+    }
+
+    /**
+     *
+     * @param blogURL string representation of the URL.
+     * @throws MalformedURLException if the given string cannot be parsed to a
+     * URL.
+     */
+    public void setBlogURL(String blogURL) throws MalformedURLException {
+        this.blogURL = new URL(blogURL);
+    }
+
+    /**
+     *
+     * @return the URL of the RSS feed.
+     */
+    public URL getFeedURL() {
+        return feedURL;
+    }
+
+    /**
+     *
+     * @param feedURL string representation of the URL.
+     * @throws MalformedURLException if the given string cannot be parsed to a
+     * URL.
+     */
+    public void setFeedURL(String feedURL) throws MalformedURLException {
+        this.feedURL = new URL(feedURL);
+    }
+
+    /**
+     *
+     * @return the name of the blog.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     *
+     * @param name the name of the blog.
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     *
+     * @return the author of the blog. May be an email address.
+     */
+    public String getAuthor() {
+        return author;
+    }
+
+    /**
+     *
+     * @param author the author of the blog. Preferably an email address.
+     */
+    public void setAuthor(String author) {
+        this.author = author;
     }
 
     @Override
@@ -35,5 +138,5 @@ public class Blog extends DatabaseObject{
     public void deleteFromDatabase() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
 }

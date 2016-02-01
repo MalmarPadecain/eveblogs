@@ -16,62 +16,51 @@
  */
 package de.eveblogs.ServerApp.Utilities;
 
+import java.util.Objects;
+
 /**
  *
  * @author Malmar Padecain
  */
 public abstract class DatabaseObject {
-    private Status statusFlag;
-    private final int primaryKey;
+
+    private DatabaseObjectStatus statusFlag;
+    private final Integer primaryKey;
 
     /**
-     * This enum represents the relation of the object to the representing object in the database.
-     */
-    public enum Status { 
-
-        /**
-         * The Object is new. There is no representing object in the Database.
-         */
-        NEW, 
-
-        /**
-         * The Objet exists in the database and has been modified. It needs to be updated.
-         */
-        MODIFIED, 
-
-        /**
-         * The Object extists in the Database and has not been modefied.
-         */
-        ORIGINAL, 
-
-        /**
-         * The Object has been deleted from the database. There exists no representing object in the database.
-         */
-        DELETED};
-    
-    /**
-     *
+     * Returns the current status of this Object.
      * @return the current status of this Object.
      */
-    public Status getStatusFlag() {
+    public DatabaseObjectStatus getStatusFlag() {
         return this.statusFlag;
     }
-    
+
     /**
-     *
-     * @param primaryKey
-     * @param statusFlag
+     * The default contstructor creates a new instance with primaryKey = null
+     * and statusFlag = NEW.
      */
-    public DatabaseObject(int primaryKey, Status statusFlag) {
-        this.primaryKey = primaryKey;
-        this.statusFlag = statusFlag;
+    public DatabaseObject() {
+        this.primaryKey = null;
+        this.statusFlag = DatabaseObjectStatus.NEW;
     }
-    
+
+    /**
+     * Creates a new instance with the given primary key an statusFlag =
+     * ORIGINAL.
+     *
+     * @param primaryKey the primaryKey of the Obect in the database.
+     */
+    public DatabaseObject(int primaryKey) {
+        this.primaryKey = primaryKey;
+        this.statusFlag = DatabaseObjectStatus.ORIGINAL;
+    }
+
     /**
      * Sets the new status flag.
+     *
      * @param statusFlag the new statusFlag.
      */
-    protected void setStatusFlag(Status statusFlag) {
+    protected void setStatusFlag(DatabaseObjectStatus statusFlag) {
         this.statusFlag = statusFlag;
     }
 
@@ -94,7 +83,7 @@ public abstract class DatabaseObject {
             return false;
         }
         final DatabaseObject other = (DatabaseObject) obj;
-        if (this.primaryKey != other.primaryKey) {
+        if (!Objects.equals(this.primaryKey, other.primaryKey)) {
             return false;
         }
         if (this.statusFlag != other.statusFlag) {
@@ -102,7 +91,7 @@ public abstract class DatabaseObject {
         }
         return true;
     }
-    
+
     /**
      *
      */
