@@ -16,24 +16,64 @@
  */
 package de.eveblogs.ServerApp;
 
+import de.eveblogs.ServerApp.Fetcher.RSSParser;
+import de.eveblogs.ServerApp.Utilities.Blog;
+import de.eveblogs.ServerApp.Utilities.Blogpost;
+import de.eveblogs.ServerApp.Utilities.Configuration;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Malmar Padecain
  */
 public class EveBlogs {
 
+    private static Configuration defaultConfig;
+
     /**
+     * Starts the Application. The Application will terminate imediately with
+     * exit status 1 if the properties file cannot be opend or read.
      *
-     * @param args the comand line arguments. "-fetch" to fetch the RSS feeds without creating new feed. "-create" to create a new feed without fetching first.
+     * @param args the comand line arguments. "-fetch" to fetch the RSS feeds
+     * without creating new feed. "-create" to create a new feed without
+     * fetching first.
      */
     public static void main(String[] args) {
-        if(args.length > 0) {
+
+        try {
+            defaultConfig = new Configuration("eveblogs.properties");
+        } catch (IOException ex) {
+            Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
+        }
+
+        if (args.length > 0) {
             String arg = args[0];
-            switch(arg) {
-                case "-fetch": break;
-                case "-create": break;
+            switch (arg) {
+                case "-fetch":
+                    break;
+                case "-create":
+                    break;
             }
         }
+
+        ArrayList<Blog> blogList = new ArrayList<>(1);
+        try {
+            blogList.add(new Blog("gsc", "Jezaja", "http://giantsecurecontainer.de/", "http://giantsecurecontainer.de/feed/"));
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(EveBlogs.class.getName()).log(Level.INFO, null, ex);
+        }
+        RSSParser testParser = new RSSParser(blogList);
+        ArrayList<Blogpost> list = testParser.getBlogpostList();
+        System.out.println(list.size());
+        list.forEach(blogpost -> {
+            System.out.println(blogpost.getName() + ": " + blogpost.getBlogpostURL());
+        });
         //Code to execute if no argument is given. 
     }
+
 }

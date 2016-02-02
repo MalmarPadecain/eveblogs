@@ -88,6 +88,7 @@ public class RSSParser {
                                     if (itemFlag) {
                                         description = reader.nextEvent().asCharacters().getData();
                                     }
+                                    break;
                                 case "link":
                                     if (itemFlag) {
                                         link = reader.nextEvent().asCharacters().getData();

@@ -18,6 +18,7 @@ package de.eveblogs.ServerApp.Utilities;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalDateTime;
 
 /**
  * This class represents a blog. It contains methods to create a blog from the
@@ -32,6 +33,7 @@ public class Blog extends DatabaseObject {
     private URL feedURL;
     private String name;
     private String author;
+    private LocalDateTime lastUpdate;
 
     /**
      * Creates a new representation of a blog from the data base. StatusFlag
@@ -59,6 +61,31 @@ public class Blog extends DatabaseObject {
         this.author = author;
         this.blogURL = new URL(blogURL);
         this.feedURL = new URL(feedURL);
+    }
+
+    /**
+     *
+     * @return the date and time, when feed of the blog was last fetched and
+     * writen to the database.
+     */
+    public LocalDateTime getLastUpdate() {
+        return lastUpdate;
+    }
+
+    /**
+     * Sets the last update time to the current time and date.
+     */
+    public void setLastUpdate() {
+        this.lastUpdate = LocalDateTime.now();
+    }
+
+    /**
+     *
+     * @param lastUpdate the time and date when the Blog was last updated in the
+     * database.
+     */
+    public void setLastUpdate(LocalDateTime lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 
     /**

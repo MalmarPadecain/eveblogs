@@ -30,6 +30,7 @@ public class Blogpost extends DatabaseObject {
 
     private URL blogpostURL;
     private String name;
+    private String description;
 
     /**
      * Creates a new representation of a blog from the data base. StatusFlag
@@ -46,11 +47,29 @@ public class Blogpost extends DatabaseObject {
      *
      * @param blogpostURL string reprensatation of the URL of the blogpost.
      * @param name the name of the blogpost.
+     * @param descripion a short summary of the content of the blogpost.
      * @throws MalformedURLException
      */
-    public Blogpost(String blogpostURL, String name) throws MalformedURLException {
+    public Blogpost(String blogpostURL, String name, String descripion) throws MalformedURLException {
         this.blogpostURL = new URL(blogpostURL);
         this.name = name;
+        this.description = descripion;
+    }
+
+    /**
+     * Returns the descripion of the blogpost.
+     * @return the descripion of the blogpost.
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Sets the description of the blogpost.
+     * @param description  a short summary of the content of the post.
+     */
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     /**

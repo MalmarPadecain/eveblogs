@@ -39,7 +39,7 @@ public class RSSFeedFetcher {
      * location specefied or error.
      */
     public static XMLEventReader getRSSFeed(Blog blog) {
-        if (blog.getFeedURL() == null) {
+        if (blog.getFeedURL() != null) {
             return getRSSFeed(blog.getFeedURL());
         } else {
             return null;
