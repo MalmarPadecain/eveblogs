@@ -17,6 +17,7 @@
 package de.eveblogs.ServerApp;
 
 import de.eveblogs.ServerApp.Fetcher.RSSParser;
+import de.eveblogs.ServerApp.Maker.RSSMaker;
 import de.eveblogs.ServerApp.Utilities.Blog;
 import de.eveblogs.ServerApp.Utilities.Blogpost;
 import de.eveblogs.ServerApp.Utilities.Configuration;
@@ -25,6 +26,7 @@ import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.stream.XMLStreamException;
 
 /**
  *
@@ -43,7 +45,8 @@ public class EveBlogs {
      * fetching first.
      */
     public static void main(String[] args) {
-
+        
+        //reads the default configuration from file. If this fais the Application is terminated.
         try {
             defaultConfig = new Configuration("eveblogs.properties");
         } catch (IOException ex) {
@@ -69,11 +72,19 @@ public class EveBlogs {
         }
         RSSParser testParser = new RSSParser(blogList);
         ArrayList<Blogpost> list = testParser.getBlogpostList();
-        System.out.println(list.size());
-        list.forEach(blogpost -> {
-            System.out.println(blogpost.getName() + ": " + blogpost.getBlogpostURL());
-        });
-        //Code to execute if no argument is given. 
+        RSSMaker maker = new RSSMaker(list);
+        try {
+            maker.createFeed();
+        } catch (IOException | XMLStreamException ex) {
+            Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
-
+    
+    /**
+     *
+     * @return the defaultConfiguration
+     */
+    public static Configuration getDefaultConfig() {
+        return defaultConfig;
+    }
 }
