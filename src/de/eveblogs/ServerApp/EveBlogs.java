@@ -16,17 +16,17 @@
  */
 package de.eveblogs.ServerApp;
 
+import de.eveblogs.ServerApp.Database.DBConnection;
 import de.eveblogs.ServerApp.Fetcher.RSSParser;
-import de.eveblogs.ServerApp.Maker.RSSMaker;
 import de.eveblogs.ServerApp.Utilities.Blog;
 import de.eveblogs.ServerApp.Utilities.Blogpost;
 import de.eveblogs.ServerApp.Utilities.Configuration;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.stream.XMLStreamException;
 
 /**
  *
@@ -45,8 +45,9 @@ public class EveBlogs {
      * fetching first.
      */
     public static void main(String[] args) {
-        
-        //reads the default configuration from file. If this fais the Application is terminated.
+        /*
+        * reads the default configuration from file. If this fais the Application is terminated.
+        */
         try {
             defaultConfig = new Configuration("eveblogs.properties");
         } catch (IOException ex) {
@@ -70,14 +71,15 @@ public class EveBlogs {
         } catch (MalformedURLException ex) {
             Logger.getLogger(EveBlogs.class.getName()).log(Level.INFO, null, ex);
         }
+        blogList.forEach(blog -> {
+            try {
+                DBConnection.getDBCon().writeObjectToDatabase(blog);
+            } catch (SQLException ex) {
+                Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
         RSSParser testParser = new RSSParser(blogList);
         ArrayList<Blogpost> list = testParser.getBlogpostList();
-        RSSMaker maker = new RSSMaker(list);
-        try {
-            maker.createFeed();
-        } catch (IOException | XMLStreamException ex) {
-            Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
     
     /**

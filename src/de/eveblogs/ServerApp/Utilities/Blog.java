@@ -16,9 +16,14 @@
  */
 package de.eveblogs.ServerApp.Utilities;
 
+import de.eveblogs.ServerApp.Database.DBConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This class represents a blog. It contains methods to create a blog from the
@@ -34,15 +39,20 @@ public class Blog extends DatabaseObject {
     private String name;
     private String author;
     private LocalDateTime lastUpdate;
-
+    private HashMap<String, String> rssElementToDBEntry;
+    /*
+    * TODO implement the Mapping from RSS Elements to DB entrys either with the FeedElementToDBEntryMappingWrapper or a simple HashMap.
+    */
+    
     /**
      * Creates a new representation of a blog from the data base. StatusFlag
      * will be ORIGINAL.
      *
      * @param primaryKey the primary key of the blog in the data base.
+     * @throws java.sql.SQLException
      */
-    public Blog(int primaryKey) {
-        super(primaryKey);
+    public Blog(int primaryKey) throws SQLException {
+        DBConnection.getDBCon().getBlogFromDB(primaryKey);
     }
 
     /**
@@ -52,15 +62,16 @@ public class Blog extends DatabaseObject {
      * @param author the author of the blog. Preferably an email address.
      * @param blogURL string representation of the URL of the blog.
      * @param feedURL string representation of the URL of the RSS feed.
-     * @throws MalformedURLException if the given strings could not be parsed to
-     * URLs.
+     * @param map
+     * @throws MalformedURLException if the last two given strings can not be
+     * parsed to an URL.
      */
-    public Blog(String name, String author, String blogURL, String feedURL) throws MalformedURLException {
-        super();
+    public Blog(String name, String author, String blogURL, String feedURL, HashMap map) throws MalformedURLException {
         this.name = name;
         this.author = author;
         this.blogURL = new URL(blogURL);
         this.feedURL = new URL(feedURL);
+        this.rssElementToDBEntry = map;
     }
 
     /**
@@ -77,6 +88,7 @@ public class Blog extends DatabaseObject {
      */
     public void setLastUpdate() {
         this.lastUpdate = LocalDateTime.now();
+        this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
 
     /**
@@ -86,6 +98,7 @@ public class Blog extends DatabaseObject {
      */
     public void setLastUpdate(LocalDateTime lastUpdate) {
         this.lastUpdate = lastUpdate;
+        this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
 
     /**
@@ -104,6 +117,7 @@ public class Blog extends DatabaseObject {
      */
     public void setBlogURL(String blogURL) throws MalformedURLException {
         this.blogURL = new URL(blogURL);
+        this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
 
     /**
@@ -122,6 +136,7 @@ public class Blog extends DatabaseObject {
      */
     public void setFeedURL(String feedURL) throws MalformedURLException {
         this.feedURL = new URL(feedURL);
+        this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
 
     /**
@@ -138,6 +153,7 @@ public class Blog extends DatabaseObject {
      */
     public void setName(String name) {
         this.name = name;
+        this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
 
     /**
@@ -154,11 +170,27 @@ public class Blog extends DatabaseObject {
      */
     public void setAuthor(String author) {
         this.author = author;
+        this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
+    }
+    
+    /**
+     * 
+     * @param key the column name in the database
+     * @return the tag in the rss feed.
+     */
+    public String getElementName(String key) {
+        return rssElementToDBEntry.get(key);
     }
 
     @Override
     public void writeToDatabase() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        DatabaseObjectStatus oldStatusFlag = getStatusFlag();
+        try {
+            DBConnection.getDBCon().writeObjectToDatabase(this);
+        } catch (SQLException ex) {
+            Logger.getLogger(Blogpost.class.getName()).log(Level.WARNING, null, ex);
+            this.setStatusFlag(oldStatusFlag);
+        }
     }
 
     @Override

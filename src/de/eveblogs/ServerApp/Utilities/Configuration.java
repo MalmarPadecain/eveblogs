@@ -22,7 +22,7 @@ import java.util.Properties;
 
 /**
  *
- * @author arbeit
+ * @author Malmar Padecain
  */
 public class Configuration {
 

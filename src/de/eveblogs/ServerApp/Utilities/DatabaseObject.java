@@ -25,7 +25,7 @@ import java.util.Objects;
 public abstract class DatabaseObject {
 
     private DatabaseObjectStatus statusFlag;
-    private final Integer primaryKey;
+    private Integer primaryKey;
 
     /**
      * Returns the current status of this Object.
@@ -33,6 +33,23 @@ public abstract class DatabaseObject {
      */
     public DatabaseObjectStatus getStatusFlag() {
         return this.statusFlag;
+    }
+    
+    /**
+     * 
+     * @return the primary key in the database. Null if not existing
+     */
+    public Integer getPrimaryKey() {
+        return this.primaryKey;
+    }
+    
+    /**
+     * 
+     * @param primaryKey the new primary key.
+     */
+    public void setPrimaryKey(Integer primaryKey) {
+        this.primaryKey = primaryKey;
+        this.statusFlag = statusFlag.ORIGINAL;
     }
 
     /**
@@ -60,7 +77,7 @@ public abstract class DatabaseObject {
      *
      * @param statusFlag the new statusFlag.
      */
-    protected void setStatusFlag(DatabaseObjectStatus statusFlag) {
+    public void setStatusFlag(DatabaseObjectStatus statusFlag) {
         this.statusFlag = statusFlag;
     }
 

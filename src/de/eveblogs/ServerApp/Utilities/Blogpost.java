@@ -16,8 +16,14 @@
  */
 package de.eveblogs.ServerApp.Utilities;
 
+import de.eveblogs.ServerApp.Database.DBConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A class representing a blogpost. It contains methods to create a blogpost
@@ -31,6 +37,8 @@ public class Blogpost extends DatabaseObject {
     private URL blogpostURL;
     private String name;
     private String description;
+    private LocalDateTime pubDate;
+    private Blog blog;
 
     /**
      * Creates a new representation of a blog from the data base. StatusFlag
@@ -48,16 +56,30 @@ public class Blogpost extends DatabaseObject {
      * @param blogpostURL string reprensatation of the URL of the blogpost.
      * @param name the name of the blogpost.
      * @param descripion a short summary of the content of the blogpost.
+     * @param pubDate
+     * @param blog
      * @throws MalformedURLException
      */
-    public Blogpost(String blogpostURL, String name, String descripion) throws MalformedURLException {
+    public Blogpost(String blogpostURL, String name, String descripion, String pubDate, Blog blog) throws MalformedURLException {
         this.blogpostURL = new URL(blogpostURL);
         this.name = name;
         this.description = descripion;
+        this.blog = blog;
+        if (pubDate != null) {
+            try {
+                this.pubDate = LocalDateTime.parse(pubDate);
+            } catch (DateTimeParseException ex) {
+                Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+                this.pubDate = LocalDateTime.now();
+            }
+        } else {
+            this.pubDate = LocalDateTime.now();
+        }
     }
 
     /**
      * Returns the descripion of the blogpost.
+     *
      * @return the descripion of the blogpost.
      */
     public String getDescription() {
@@ -66,10 +88,12 @@ public class Blogpost extends DatabaseObject {
 
     /**
      * Sets the description of the blogpost.
-     * @param description  a short summary of the content of the post.
+     *
+     * @param description a short summary of the content of the post.
      */
     public void setDescription(String description) {
         this.description = description;
+        this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
 
     /**
@@ -90,6 +114,7 @@ public class Blogpost extends DatabaseObject {
      */
     public void setBlogpostURL(String blogpostURL) throws MalformedURLException {
         this.blogpostURL = new URL(blogpostURL);
+        this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
 
     /**
@@ -108,11 +133,34 @@ public class Blogpost extends DatabaseObject {
      */
     public void setName(String name) {
         this.name = name;
+        this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
+    }
+
+    public LocalDateTime getPubDate() {
+        return pubDate;
+    }
+
+    public void setPubDate(LocalDateTime pubDate) {
+        this.pubDate = pubDate;
+    }
+
+    public Blog getBlog() {
+        return blog;
+    }
+
+    public void setBlog(Blog blog) {
+        this.blog = blog;
     }
 
     @Override
     public void writeToDatabase() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        DatabaseObjectStatus oldStatusFlag = getStatusFlag();
+        try {
+            DBConnection.getDBCon().writeObjectToDatabase(this);
+        } catch (SQLException ex) {
+            Logger.getLogger(Blogpost.class.getName()).log(Level.WARNING, null, ex);
+            this.setStatusFlag(oldStatusFlag);
+        }
     }
 
     @Override

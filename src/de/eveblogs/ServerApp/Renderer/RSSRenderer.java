@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.eveblogs.ServerApp.Maker;
+package de.eveblogs.ServerApp.Renderer;
 
 import de.eveblogs.ServerApp.EveBlogs;
 import de.eveblogs.ServerApp.Utilities.Blogpost;
@@ -36,7 +36,7 @@ import javax.xml.stream.XMLStreamException;
  *
  * @author Malmar Padecain
  */
-public class RSSMaker {
+public class RSSRenderer {
     private final ArrayList<Blogpost> blogpostList;
     private final Path locationOfRSSHeader;
     private final Path targetLocation;
@@ -45,24 +45,29 @@ public class RSSMaker {
      * 
      * @param list the list with the blogposts that will be writen to the feed.
      */
-    public RSSMaker(ArrayList<Blogpost> list) {
+    public RSSRenderer(ArrayList<Blogpost> list) {
         this.blogpostList = list;
         this.locationOfRSSHeader = Paths.get(EveBlogs.getDefaultConfig().getProperty("locationOfRSSHeader"));
         this.targetLocation = Paths.get(EveBlogs.getDefaultConfig().getProperty("targetLocation"));
     }
     
+    /**
+     * Outputs the RSS feed to the location specified in the config.properties with the header specefied at the same location.
+     * @throws IOException in case the RSS Header could not be copied to the target location.
+     * @throws XMLStreamException 
+     */
     public void createFeed() throws IOException, XMLStreamException {
+        //copy header to output and append.
         Files.copy(locationOfRSSHeader, targetLocation, StandardCopyOption.REPLACE_EXISTING);
-//        Files.delete(targetLocation);
-//        Files.createFile(targetLocation);
         XMLEventWriter writer = XMLOutputFactory.newFactory().createXMLEventWriter(new FileOutputStream(targetLocation.toFile(), true));
-//        writer.add(XMLInputFactory.newInstance().createXMLEventReader(new FileInputStream(locationOfRSSHeader.toFile())));
-//        writer.flush();
+        
         for(Blogpost blogpost : blogpostList) {
             parseBlogpost(blogpost, writer);
         }
         writer.flush();
         writer.close();
+        
+        //Adding closing tags to file.
         FileWriter fileWriter = new FileWriter(targetLocation.toFile(), true);
         fileWriter.write("</channel></rss>");
         fileWriter.flush();
