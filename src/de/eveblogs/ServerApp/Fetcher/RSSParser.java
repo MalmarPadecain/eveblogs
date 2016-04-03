@@ -79,30 +79,38 @@ public class RSSParser {
                             StartElement startElement = event.asStartElement();
                             
                             /*
-                            * TODO the cases have to depend on the values in blog.rssElementToDBEntry
                             * TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a loop in each case.
+                            * TODO try to bring this in a bit a more beautiful form.
                             */
                             
-                            switch (startElement.getName().toString()) {
-                                case "item":
-                                    itemFlag = true;
-                                    break;
-                                case "title":
-                                    if (itemFlag) {
+                            String elementContent = startElement.getName().toString();
+                            if(elementContent.equals("item")) {
+                                itemFlag = true;
+                            }
+                            else if(elementContent.equals(blog.getElementName("xmlBlogpostName"))){
+                                if (itemFlag) {
                                         name = reader.nextEvent().asCharacters().getData();
                                     }
-                                    break;
-                                case "description":
-                                    if (itemFlag) {
-                                        description = reader.nextEvent().asCharacters().getData();
-                                    }
-                                    break;
-                                case "link":
-                                    if (itemFlag) {
+                            }
+                            else if(elementContent.equals(blog.getElementName("xmlBlogpostLink"))) {
+                                if (itemFlag) {
                                         link = reader.nextEvent().asCharacters().getData();
                                     }
-                                    break;
                             }
+                            else if(elementContent.equals(blog.getElementName("xmlDescription"))) {
+                                if (itemFlag) {
+                                        description = reader.nextEvent().asCharacters().getData();
+                                    }
+                            }
+                            else if(elementContent.equals(blog.getElementName("xmlPublicationDateTime"))) {
+                                /*
+                                * TODO solve parsing of the timestamp 
+                                if (itemFlag) {
+                                    pubDate = reader.nextEvent().asCharacters().getData();
+                                }
+                                */
+                            }
+                            
                             break;
                         case XMLEvent.END_ELEMENT:
                             EndElement endElement = event.asEndElement();
