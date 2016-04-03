@@ -29,6 +29,7 @@ import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
 /**
+ * Class to create Blogposts from a RSS feed.
  *
  * @author Malmar Padecain
  */
@@ -55,12 +56,12 @@ public class RSSParser {
     public ArrayList<Blogpost> getBlogpostList() {
         final ArrayList<Blogpost> blogpostList = new ArrayList<>(5);
         blogList.forEach(blog -> {
-            blogpostList.addAll(parse(blog));
+            blogpostList.addAll(parseBlogposts(blog));
         });
         return blogpostList;
     }
 
-    private ArrayList<Blogpost> parse(Blog blog) {
+    private ArrayList<Blogpost> parseBlogposts(Blog blog) {
         final ArrayList<Blogpost> blogpostList = new ArrayList<>(2);
         XMLEventReader reader = RSSFeedFetcher.getRSSFeed(blog);
         if (reader != null) {
@@ -69,12 +70,19 @@ public class RSSParser {
                 String name = null;
                 String link = null;
                 String description = null;
+                String pubDate = null;
                 while (reader.hasNext()) {
                     XMLEvent event = reader.nextEvent();
 
                     switch (event.getEventType()) {
                         case XMLEvent.START_ELEMENT:
                             StartElement startElement = event.asStartElement();
+                            
+                            /*
+                            * TODO the cases have to depend on the values in blog.rssElementToDBEntry
+                            * TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a loop in each case.
+                            */
+                            
                             switch (startElement.getName().toString()) {
                                 case "item":
                                     itemFlag = true;
@@ -84,7 +92,7 @@ public class RSSParser {
                                         name = reader.nextEvent().asCharacters().getData();
                                     }
                                     break;
-                                case "description": 
+                                case "description":
                                     if (itemFlag) {
                                         description = reader.nextEvent().asCharacters().getData();
                                     }
@@ -101,15 +109,24 @@ public class RSSParser {
                             switch (endElement.getName().toString()) {
                                 case "item":
                                     itemFlag = false;
+                                    /*
+                                    * creates a new Blogpost if there is a link and either a name or a descripion. These Elements must be present for it to be a validate RSS document according to the RSS specifications 2.0
+                                    */
                                     if (link != null && (name != null || description != null)) {
                                         try {
-                                            blogpostList.add(new Blogpost(link, name, description));
+                                            blogpostList.add(new Blogpost(link, name, description, pubDate, blog));
                                         } catch (MalformedURLException ex) {
-                                            Logger.getLogger(RSSParser.class.getName()).log(Level.SEVERE, null, ex);
+                                            Logger.getLogger(RSSParser.class.getName()).log(Level.WARNING, null, ex);
                                         }
                                     }
+                                    
+                                    /*
+                                    * sets all variables back to NULL
+                                    */
                                     name = null;
                                     link = null;
+                                    description = null;
+                                    pubDate = null;
                                     break;
                             }
                     }

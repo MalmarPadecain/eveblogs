@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -67,7 +68,13 @@ public class EveBlogs {
 
         ArrayList<Blog> blogList = new ArrayList<>(1);
         try {
-            blogList.add(new Blog("gsc", "Jezaja", "http://giantsecurecontainer.de/", "http://giantsecurecontainer.de/feed/"));
+            HashMap<String, String> map = new HashMap<>();
+            map.put("xmlBlogpostName", "title");
+            map.put("xmlBlogpostLink", "link");
+            map.put("xmlPublicationDateTime", "pubDate");
+            map.put("xmlDescription", "description");
+            
+            blogList.add(new Blog("gsc", "Jezaja", "http://giantsecurecontainer.de/", "http://giantsecurecontainer.de/feed/", map));
         } catch (MalformedURLException ex) {
             Logger.getLogger(EveBlogs.class.getName()).log(Level.INFO, null, ex);
         }
@@ -80,6 +87,13 @@ public class EveBlogs {
         });
         RSSParser testParser = new RSSParser(blogList);
         ArrayList<Blogpost> list = testParser.getBlogpostList();
+        list.forEach(blogpost -> {
+            try {
+                DBConnection.getDBCon().writeObjectToDatabase(blogpost);
+            } catch (SQLException ex) {
+                Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        });
     }
     
     /**
