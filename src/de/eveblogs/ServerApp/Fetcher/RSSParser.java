@@ -49,10 +49,15 @@ public class RSSParser {
      */
     public RSSParser(ArrayList<Blog> blogList) {
         this.blogList = blogList;
+        
+        /*
+        * TODO add this to the propperties file.
+        */
         this.formatterList = new LinkedList<>();
+        
         /*
         * TODO test if there are cases that dont't use one of these formats.
-         */
+        */
         this.formatterList.add(DateTimeFormatter.RFC_1123_DATE_TIME); //The format that is used in most feeds using simple RSS
         this.formatterList.add(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")); // The fomat that is used in most Atom feeds
     }
@@ -109,6 +114,10 @@ public class RSSParser {
                                     description = reader.nextEvent().asCharacters().getData();
                                 }
                             } else if (elementContent.equals(blog.getElementName("xmlPublicationDateTime"))) {
+                                /*
+                                * tries to parse the date with all formatters in this.formatterList. 
+                                * if all fail the current time is set and  a warning logged.
+                                */
                                 if (itemFlag) {
                                     try {
                                         pubDate = LocalDateTime.parse(reader.nextEvent().asCharacters().getData(), this.formatterList.getFirst());
