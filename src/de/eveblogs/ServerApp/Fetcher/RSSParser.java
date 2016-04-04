@@ -19,7 +19,11 @@ package de.eveblogs.ServerApp.Fetcher;
 import de.eveblogs.ServerApp.Utilities.Blog;
 import de.eveblogs.ServerApp.Utilities.Blogpost;
 import java.net.MalformedURLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.stream.XMLEventReader;
@@ -36,6 +40,7 @@ import javax.xml.stream.events.XMLEvent;
 public class RSSParser {
 
     private final ArrayList<Blog> blogList;
+    private final LinkedList<DateTimeFormatter> formatterList;
 
     /**
      * Creates a new RSSParser.
@@ -44,6 +49,12 @@ public class RSSParser {
      */
     public RSSParser(ArrayList<Blog> blogList) {
         this.blogList = blogList;
+        this.formatterList = new LinkedList<>();
+        /*
+        * TODO test if there are cases that dont't use one of these formats.
+         */
+        this.formatterList.add(DateTimeFormatter.RFC_1123_DATE_TIME); //The format that is used in most feeds using simple RSS
+        this.formatterList.add(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")); // The fomat that is used in most Atom feeds
     }
 
     /**
@@ -70,47 +81,48 @@ public class RSSParser {
                 String name = null;
                 String link = null;
                 String description = null;
-                String pubDate = null;
+                LocalDateTime pubDate = null;
                 while (reader.hasNext()) {
                     XMLEvent event = reader.nextEvent();
 
                     switch (event.getEventType()) {
                         case XMLEvent.START_ELEMENT:
                             StartElement startElement = event.asStartElement();
-                            
+
                             /*
                             * TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a loop in each case.
                             * TODO try to bring this in a bit a more beautiful form.
-                            */
-                            
+                             */
                             String elementContent = startElement.getName().toString();
-                            if(elementContent.equals("item")) {
+                            if (elementContent.equals("item")) {
                                 itemFlag = true;
-                            }
-                            else if(elementContent.equals(blog.getElementName("xmlBlogpostName"))){
+                            } else if (elementContent.equals(blog.getElementName("xmlBlogpostName"))) {
                                 if (itemFlag) {
-                                        name = reader.nextEvent().asCharacters().getData();
-                                    }
-                            }
-                            else if(elementContent.equals(blog.getElementName("xmlBlogpostLink"))) {
-                                if (itemFlag) {
-                                        link = reader.nextEvent().asCharacters().getData();
-                                    }
-                            }
-                            else if(elementContent.equals(blog.getElementName("xmlDescription"))) {
-                                if (itemFlag) {
-                                        description = reader.nextEvent().asCharacters().getData();
-                                    }
-                            }
-                            else if(elementContent.equals(blog.getElementName("xmlPublicationDateTime"))) {
-                                /*
-                                * TODO solve parsing of the timestamp 
-                                if (itemFlag) {
-                                    pubDate = reader.nextEvent().asCharacters().getData();
+                                    name = reader.nextEvent().asCharacters().getData();
                                 }
-                                */
+                            } else if (elementContent.equals(blog.getElementName("xmlBlogpostLink"))) {
+                                if (itemFlag) {
+                                    link = reader.nextEvent().asCharacters().getData();
+                                }
+                            } else if (elementContent.equals(blog.getElementName("xmlDescription"))) {
+                                if (itemFlag) {
+                                    description = reader.nextEvent().asCharacters().getData();
+                                }
+                            } else if (elementContent.equals(blog.getElementName("xmlPublicationDateTime"))) {
+                                if (itemFlag) {
+                                    try {
+                                        pubDate = LocalDateTime.parse(reader.nextEvent().asCharacters().getData(), this.formatterList.getFirst());
+                                    } catch (DateTimeParseException ex) {
+                                        try {
+                                            pubDate = LocalDateTime.parse(reader.nextEvent().asCharacters().getData(), this.formatterList.get(1));
+                                        } catch (DateTimeParseException ex2) {
+                                            Logger.getLogger(RSSParser.class.getName()).log(Level.WARNING, "Blog " + blog + " uses unsupported DateTime format", ex);
+                                            pubDate = LocalDateTime.now();
+                                        }
+                                    }
+                                }
                             }
-                            
+
                             break;
                         case XMLEvent.END_ELEMENT:
                             EndElement endElement = event.asEndElement();
@@ -119,7 +131,7 @@ public class RSSParser {
                                     itemFlag = false;
                                     /*
                                     * creates a new Blogpost if there is a link and either a name or a descripion. These Elements must be present for it to be a validate RSS document according to the RSS specifications 2.0
-                                    */
+                                     */
                                     if (link != null && (name != null || description != null)) {
                                         try {
                                             blogpostList.add(new Blogpost(link, name, description, pubDate, blog));
@@ -127,10 +139,10 @@ public class RSSParser {
                                             Logger.getLogger(RSSParser.class.getName()).log(Level.WARNING, null, ex);
                                         }
                                     }
-                                    
+
                                     /*
                                     * sets all variables back to NULL
-                                    */
+                                     */
                                     name = null;
                                     link = null;
                                     description = null;

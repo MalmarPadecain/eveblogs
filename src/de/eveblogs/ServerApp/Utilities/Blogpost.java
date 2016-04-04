@@ -60,21 +60,12 @@ public class Blogpost extends DatabaseObject {
      * @param blog
      * @throws MalformedURLException
      */
-    public Blogpost(String blogpostURL, String name, String descripion, String pubDate, Blog blog) throws MalformedURLException {
+    public Blogpost(String blogpostURL, String name, String descripion, LocalDateTime pubDate, Blog blog) throws MalformedURLException {
         this.blogpostURL = new URL(blogpostURL);
         this.name = name;
         this.description = descripion;
         this.blog = blog;
-        if (pubDate != null) {
-            try {
-                this.pubDate = LocalDateTime.parse(pubDate);
-            } catch (DateTimeParseException ex) {
-                Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
-                this.pubDate = LocalDateTime.now();
-            }
-        } else {
-            this.pubDate = LocalDateTime.now();
-        }
+        this.pubDate = pubDate;
     }
 
     /**
