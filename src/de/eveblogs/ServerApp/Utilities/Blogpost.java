@@ -20,8 +20,8 @@ import de.eveblogs.ServerApp.Database.DBConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeParseException;
+import java.util.Date;
+//import java.time.LocalDateTime;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +37,7 @@ public class Blogpost extends DatabaseObject {
     private URL blogpostURL;
     private String name;
     private String description;
-    private LocalDateTime pubDate;
+    private Date pubDate;
     private Blog blog;
 
     /**
@@ -60,7 +60,7 @@ public class Blogpost extends DatabaseObject {
      * @param blog
      * @throws MalformedURLException
      */
-    public Blogpost(String blogpostURL, String name, String descripion, LocalDateTime pubDate, Blog blog) throws MalformedURLException {
+    public Blogpost(String blogpostURL, String name, String descripion, Date pubDate, Blog blog) throws MalformedURLException {
         this.blogpostURL = new URL(blogpostURL);
         this.name = name;
         this.description = descripion;
@@ -127,11 +127,11 @@ public class Blogpost extends DatabaseObject {
         this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
 
-    public LocalDateTime getPubDate() {
+    public Date getPubDate() {
         return pubDate;
     }
 
-    public void setPubDate(LocalDateTime pubDate) {
+    public void setPubDate(Date pubDate) {
         this.pubDate = pubDate;
     }
 

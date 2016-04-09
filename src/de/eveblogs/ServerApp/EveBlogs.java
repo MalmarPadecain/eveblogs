@@ -48,7 +48,7 @@ public class EveBlogs {
     public static void main(String[] args) {
         /*
         * reads the default configuration from file. If this fais the Application is terminated.
-        */
+         */
         try {
             defaultConfig = new Configuration("eveblogs.properties");
         } catch (IOException ex) {
@@ -73,29 +73,29 @@ public class EveBlogs {
             map.put("xmlBlogpostLink", "link");
             map.put("xmlPublicationDateTime", "pubDate");
             map.put("xmlDescription", "description");
-            
+
             blogList.add(new Blog("gsc", "Jezaja", "http://giantsecurecontainer.de/", "http://giantsecurecontainer.de/feed/", map));
         } catch (MalformedURLException ex) {
             Logger.getLogger(EveBlogs.class.getName()).log(Level.INFO, null, ex);
         }
-        blogList.forEach(blog -> {
+        for (Blog blog : blogList) {
             try {
                 DBConnection.getDBCon().writeObjectToDatabase(blog);
             } catch (SQLException ex) {
                 Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
             }
-        });
+        };
         RSSParser testParser = new RSSParser(blogList);
         ArrayList<Blogpost> list = testParser.getBlogpostList();
-        list.forEach(blogpost -> {
+        for (Blogpost blogpost : list) {
             try {
                 DBConnection.getDBCon().writeObjectToDatabase(blogpost);
             } catch (SQLException ex) {
                 Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
             }
-        });
+        };
     }
-    
+
     /**
      *
      * @return the defaultConfiguration
