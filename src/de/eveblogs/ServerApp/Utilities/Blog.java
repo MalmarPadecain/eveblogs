@@ -197,5 +197,10 @@ public class Blog extends DatabaseObject {
     public void deleteFromDatabase() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+    
+    @Override
+    public String toString() {
+        return this.name + ": " + this.blogURL.toExternalForm() + " (" + this.feedURL.toExternalForm() + ")";
+    }
 
 }
