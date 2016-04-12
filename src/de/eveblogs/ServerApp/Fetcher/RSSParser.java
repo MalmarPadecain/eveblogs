@@ -21,12 +21,10 @@ import de.eveblogs.ServerApp.Utilities.Blogpost;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-//import java.time.LocalDateTime;
-//import java.time.format.DateTimeFormatter;
-//import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.stream.XMLEventReader;
@@ -53,23 +51,16 @@ public class RSSParser {
      */
     public RSSParser(ArrayList<Blog> blogList) {
         this.blogList = blogList;
-        this.dateFormat = new SimpleDateFormat();
+        this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ENGLISH);
 
-        /*
-        * TODO add this to the propperties file.
-         */
         this.dateFormatPattern = new LinkedList<>();
 
         /*
-        * TODO test if there are cases that dont't use one of these formats.
-         */
-        this.dateFormatPattern.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-        this.dateFormatPattern.add("EEE, dd MMM yyyy kk:mm:ss XXXX");
-        /*
-        * Commentetd out to rewrite to Java 7 compatibility.
-        this.formatterList.add(DateTimeFormatter.RFC_1123_DATE_TIME); //The format that is used in most feeds using simple RSS
-        this.formatterList.add(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSXXX")); // The fomat that is used in most Atom feeds
-         */
+        TODO test if there are cases that dont't use one of these formats.
+        TODO add this to the propperties file.
+        */
+//        this.dateFormatPattern.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        this.dateFormatPattern.add("EEE, dd MMM yyyy HH:mm:ss Z");
     }
 
     /**
@@ -125,17 +116,17 @@ public class RSSParser {
                                 }
                             } else if (elementContent.equals(blog.getElementName("xmlPublicationDateTime"))) {
                                 /*
-                                * tries to parse the date with all formatters in this.formatterList. 
-                                * if all fail the current time is set and  a warning logged.
-                                 */
+                                tries to parse the date with all formatters in this.formatterList. 
+                                if all fail the current time is set and  a warning logged.
+                                */
                                 if (itemFlag) {
                                     try {
-                                        dateFormat.applyPattern(dateFormatPattern.get(0));
-                                        pubDate = dateFormat.parse(reader.nextEvent().asCharacters().toString());
+//                                        dateFormat.applyPattern(dateFormatPattern.get(0));
+                                        pubDate = dateFormat.parse(reader.peek().asCharacters().toString());
                                     } catch (ParseException ex) {
                                         try {
-                                            dateFormat.applyPattern(dateFormatPattern.get(1));
-                                            pubDate = dateFormat.parse(reader.nextEvent().asCharacters().toString());
+                                            dateFormat.applyPattern(dateFormatPattern.get(0));
+                                            pubDate = dateFormat.parse(reader.peek().asCharacters().toString());
                                         } catch (ParseException ex1) {
                                             Logger.getLogger(RSSParser.class.getName()).log(Level.WARNING, "Blog " + blog + " uses unsupported DateTime format", ex);
                                             pubDate = new Date();
