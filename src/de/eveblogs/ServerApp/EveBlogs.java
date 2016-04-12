@@ -43,29 +43,38 @@ public class EveBlogs {
      *
      * @param args the comand line arguments. "-fetch" to fetch the RSS feeds
      * without creating new feed. "-create" to create a new feed without
-     * fetching first.
+     * fetching first. Leave empty to do both.
      */
     public static void main(String[] args) {
         /*
-        * reads the default configuration from file. If this fais the Application is terminated.
-         */
+        reads the default configuration from file. If this fais the Application is terminated.
+        */
         try {
             defaultConfig = new Configuration("eveblogs.properties");
         } catch (IOException ex) {
             Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
-
+        
         if (args.length > 0) {
             String arg = args[0];
             switch (arg) {
                 case "-fetch":
+                    fetchFeed();
                     break;
                 case "-create":
+                    createFeed();
+                    break;
+                default:
+                    fetchFeed();
+                    createFeed();
                     break;
             }
         }
-
+        
+        /*
+        the following is code for testing purposes.
+        */
         ArrayList<Blog> blogList = new ArrayList<>(1);
         try {
             HashMap<String, String> map = new HashMap<>();
@@ -84,7 +93,7 @@ public class EveBlogs {
             } catch (SQLException ex) {
                 Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
             }
-        };
+        }
         RSSParser testParser = new RSSParser(blogList);
         ArrayList<Blogpost> list = testParser.getBlogpostList();
         for (Blogpost blogpost : list) {
@@ -93,7 +102,15 @@ public class EveBlogs {
             } catch (SQLException ex) {
                 Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
             }
-        };
+        }
+    }
+    
+    private static void fetchFeed() {
+        // TODO write this
+    }
+    
+    private static void createFeed() {
+        // TODO write this
     }
 
     /**
