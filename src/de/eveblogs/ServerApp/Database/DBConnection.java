@@ -29,6 +29,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -102,7 +103,7 @@ public class DBConnection {
                     statement.setString(2, blogpost.getName());
                     statement.setString(3, blogpost.getDescription());
                     statement.setInt(4, blogpost.getBlog().getPrimaryKey());
-                    statement.setString(5, blogpost.getPubDate().toString());
+                    statement.setTimestamp(5, new Timestamp(blogpost.getPubDate().getTime()));
                     statement.executeUpdate();
                     ResultSet rs = con.createStatement().executeQuery("SELECT LAST_INSERT_ID();");
                     rs.first();
@@ -116,7 +117,7 @@ public class DBConnection {
                     statement.setString(2, blogpost.getName());
                     statement.setString(3, blogpost.getDescription());
                     statement.setInt(4, blogpost.getBlog().getPrimaryKey());
-                    statement.setString(5, blogpost.getPubDate().toString());
+                    statement.setTimestamp(5, new Timestamp(blogpost.getPubDate().getTime()));
                     statement.executeUpdate();
                     blogpost.setStatusFlag(DatabaseObjectStatus.ORIGINAL);
                     return blogpost.getPrimaryKey();

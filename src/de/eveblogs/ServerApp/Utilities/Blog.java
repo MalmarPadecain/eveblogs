@@ -20,7 +20,7 @@ import de.eveblogs.ServerApp.Database.DBConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,7 +38,7 @@ public class Blog extends DatabaseObject {
     private URL feedURL;
     private String name;
     private String author;
-    private LocalDateTime lastUpdate;
+    private Date lastUpdate;
     private HashMap<String, String> rssElementToDBEntry;
     /*
     * TODO implement the Mapping from RSS Elements to DB entrys either with the FeedElementToDBEntryMappingWrapper or a simple HashMap.
@@ -79,15 +79,15 @@ public class Blog extends DatabaseObject {
      * @return the date and time, when feed of the blog was last fetched and
      * writen to the database.
      */
-    public LocalDateTime getLastUpdate() {
+    public Date getLastUpdate() {
         return lastUpdate;
     }
-
+    
     /**
      * Sets the last update time to the current time and date.
      */
     public void setLastUpdate() {
-        this.lastUpdate = LocalDateTime.now();
+        this.lastUpdate = new Date();
         this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
 
@@ -96,7 +96,7 @@ public class Blog extends DatabaseObject {
      * @param lastUpdate the time and date when the Blog was last updated in the
      * database.
      */
-    public void setLastUpdate(LocalDateTime lastUpdate) {
+    public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
         this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
@@ -196,6 +196,11 @@ public class Blog extends DatabaseObject {
     @Override
     public void deleteFromDatabase() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public String toString() {
+        return this.name + ": " + this.blogURL.toExternalForm() + " (" + this.feedURL.toExternalForm() + ")";
     }
 
 }
