@@ -148,7 +148,7 @@ public class Blogpost extends DatabaseObject {
         DatabaseObjectStatus oldStatusFlag = getStatusFlag();
         try {
             DBConnection.getDBCon().writeObjectToDatabase(this);
-        } catch (SQLException ex) {
+        } catch (SQLException | MalformedURLException ex) {
             Logger.getLogger(Blogpost.class.getName()).log(Level.WARNING, null, ex);
             this.setStatusFlag(oldStatusFlag);
         }

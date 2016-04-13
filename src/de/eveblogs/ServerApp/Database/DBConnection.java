@@ -139,22 +139,19 @@ public class DBConnection {
      * created.
      *
      * @return the database connection
+     * @throws java.net.MalformedURLException
+     * @throws java.sql.SQLException
      */
-    public static DBConnection getDBCon() {
-        try {
-            if (dbCon == null) {
-                int port = Integer.parseInt(EveBlogs.getDefaultConfig().getProperty("DataBaseServerPort"));
-                String serverAddress = EveBlogs.getDefaultConfig().getProperty("DataBaseServerAddress");
-                String dbName = EveBlogs.getDefaultConfig().getProperty("DataBaseName");
-                String user = EveBlogs.getDefaultConfig().getProperty("DataBaseUser");
-                String password = EveBlogs.getDefaultConfig().getProperty("DataBasePassword");
-                dbCon = new DBConnection(serverAddress, port, dbName, user, password);
-            }
-            return dbCon;
-        } catch (MalformedURLException | SQLException ex) {
-            Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
-            return null;
+    public static DBConnection getDBCon() throws MalformedURLException, SQLException {
+        if (dbCon == null) {
+            int port = Integer.parseInt(EveBlogs.getDefaultConfig().getProperty("DataBaseServerPort"));
+            String serverAddress = EveBlogs.getDefaultConfig().getProperty("DataBaseServerAddress");
+            String dbName = EveBlogs.getDefaultConfig().getProperty("DataBaseName");
+            String user = EveBlogs.getDefaultConfig().getProperty("DataBaseUser");
+            String password = EveBlogs.getDefaultConfig().getProperty("DataBasePassword");
+            dbCon = new DBConnection(serverAddress, port, dbName, user, password);
         }
+        return dbCon;
     }
 
     /**
@@ -215,8 +212,8 @@ public class DBConnection {
                     map.put("blogpostLink", rs.getString("xmlBlogpostLink"));
                     map.put("publicationDateTime", rs.getString("xmlPublicationDateTime"));
                     map.put("description", rs.getString("xmlDescription"));
-                    
-                    blogList.add(new Blog(rs.getInt("PK_Blog"), rs.getString("blogName"), rs.getString("blogLink"), rs.getString("feedLink"), rs.getString("author"), map));
+
+                    blogList.add(new Blog(rs.getInt("PK_Blog"), rs.getString("blogName"), rs.getString("author"), rs.getString("blogLink"), rs.getString("feedLink"), map));
                 } catch (MalformedURLException ex) {
                     Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
                 }

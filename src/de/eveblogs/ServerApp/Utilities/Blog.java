@@ -52,7 +52,11 @@ public class Blog extends DatabaseObject {
      * @throws java.sql.SQLException
      */
     public Blog(int primaryKey) throws SQLException {
-        DBConnection.getDBCon().getBlogFromDB(primaryKey);
+        try {
+            DBConnection.getDBCon().getBlogFromDB(primaryKey);
+        } catch (MalformedURLException ex) {
+            Logger.getLogger(Blog.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -207,7 +211,7 @@ public class Blog extends DatabaseObject {
         DatabaseObjectStatus oldStatusFlag = getStatusFlag();
         try {
             DBConnection.getDBCon().writeObjectToDatabase(this);
-        } catch (SQLException ex) {
+        } catch (SQLException | MalformedURLException ex) {
             Logger.getLogger(Blogpost.class.getName()).log(Level.WARNING, null, ex);
             this.setStatusFlag(oldStatusFlag);
         }

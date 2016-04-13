@@ -24,8 +24,7 @@ import de.eveblogs.ServerApp.Utilities.Configuration;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,6 +35,7 @@ import java.util.logging.Logger;
 public class EveBlogs {
 
     private static Configuration defaultConfig;
+    private static DBConnection connection;
 
     /**
      * Starts the Application. The Application will terminate imediately with
@@ -48,33 +48,51 @@ public class EveBlogs {
     public static void main(String[] args) {
         /*
         reads the default configuration from file. If this fais the Application is terminated.
-        */
+         */
         try {
             defaultConfig = new Configuration("eveblogs.properties");
         } catch (IOException ex) {
-            Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, "Faild to read eveblogs.properties.", ex);
             System.exit(1);
         }
-        
+
+        /*
+        establishes the connection to the database
+         */
+        try {
+            connection = DBConnection.getInstance();
+        } catch (MalformedURLException | SQLException ex) {
+            Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, "Faild to connect to the database.", ex);
+            System.exit(2);
+        }
+
         if (args.length > 0) {
             String arg = args[0];
             switch (arg) {
                 case "-fetch":
-                    fetchFeed();
+                    try {
+                        fetchFeed();
+                    } catch (SQLException ex) {
+                        Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     break;
                 case "-create":
                     createFeed();
                     break;
-                default:
-                    fetchFeed();
-                    createFeed();
-                    break;
+            }
+        } else {
+            try {
+                fetchFeed();
+            } catch (SQLException ex) {
+                Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+        createFeed();
+
         /*
         the following is code for testing purposes.
-        */
+         */
+ /*
         ArrayList<Blog> blogList = new ArrayList<>(1);
         try {
             HashMap<String, String> map = new HashMap<>();
@@ -103,12 +121,23 @@ public class EveBlogs {
                 Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+         */
     }
-    
-    private static void fetchFeed() {
-        // TODO write this
+
+    private static void fetchFeed() throws SQLException {
+        LinkedList<Blog> blogList = connection.getAllActiveBlogs();
+        RSSParser parser = new RSSParser(blogList);
+        LinkedList<Blogpost> blogpostList = parser.getBlogpostList();
+        for (Blogpost blogpost : blogpostList) {
+            try {
+                connection.writeObjectToDatabase(blogpost);
+            } catch (SQLException ex) {
+                Logger.getLogger(EveBlogs.class
+                        .getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
-    
+
     private static void createFeed() {
         // TODO write this
     }

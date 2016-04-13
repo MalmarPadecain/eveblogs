@@ -40,7 +40,7 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class RSSParser {
 
-    private final ArrayList<Blog> blogList;
+    private final LinkedList<Blog> blogList;
     private final LinkedList<String> dateFormatPattern;
     private final SimpleDateFormat dateFormat;
 
@@ -49,7 +49,7 @@ public class RSSParser {
      *
      * @param blogList a list of blogs whose feeds need to be parsed.
      */
-    public RSSParser(ArrayList<Blog> blogList) {
+    public RSSParser(LinkedList<Blog> blogList) {
         this.blogList = blogList;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ENGLISH);
 
@@ -70,8 +70,8 @@ public class RSSParser {
      * @return an ArrayList with at least all blogbosts published later than the
      * latest blogpost of each blog added to the database. May contain more.
      */
-    public ArrayList<Blogpost> getBlogpostList() {
-        final ArrayList<Blogpost> blogpostList = new ArrayList<>(5);
+    public LinkedList<Blogpost> getBlogpostList() {
+        final LinkedList<Blogpost> blogpostList = new LinkedList<>();
         for (Blog blog : blogList) {
             blogpostList.addAll(parseBlogposts(blog));
         }
@@ -94,27 +94,27 @@ public class RSSParser {
                     switch (event.getEventType()) {
                         case XMLEvent.START_ELEMENT:
                             StartElement startElement = event.asStartElement();
-
+                            
                             /*
-                            * TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a loop in each case.
-                            * TODO try to bring this in a bit a more beautiful form.
-                             */
+                            TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a loop in each case.
+                            TODO try to bring this in a bit a more beautiful form.
+                            */
                             String elementContent = startElement.getName().toString();
                             if (elementContent.equals("item")) {
                                 itemFlag = true;
-                            } else if (elementContent.equals(blog.getElementName("xmlBlogpostName"))) {
+                            } else if (elementContent.equals(blog.getElementName("blogpostName"))) {
                                 if (itemFlag) {
                                     name = reader.nextEvent().asCharacters().getData();
                                 }
-                            } else if (elementContent.equals(blog.getElementName("xmlBlogpostLink"))) {
+                            } else if (elementContent.equals(blog.getElementName("blogpostLink"))) {
                                 if (itemFlag) {
                                     link = reader.nextEvent().asCharacters().getData();
                                 }
-                            } else if (elementContent.equals(blog.getElementName("xmlDescription"))) {
+                            } else if (elementContent.equals(blog.getElementName("description"))) {
                                 if (itemFlag) {
                                     description = reader.nextEvent().asCharacters().getData();
                                 }
-                            } else if (elementContent.equals(blog.getElementName("xmlPublicationDateTime"))) {
+                            } else if (elementContent.equals(blog.getElementName("publicationDateTime"))) {
                                 /*
                                 tries to parse the date with all formatters in this.formatterList. 
                                 if all fail the current time is set and  a warning logged.
@@ -142,8 +142,8 @@ public class RSSParser {
                                 case "item":
                                     itemFlag = false;
                                     /*
-                                    * creates a new Blogpost if there is a link and either a name or a descripion. These Elements must be present for it to be a validate RSS document according to the RSS specifications 2.0
-                                     */
+                                    creates a new Blogpost if there is a link and either a name or a descripion. These Elements must be present for it to be a validate RSS document according to the RSS specifications 2.0
+                                    */
                                     if (link != null && (name != null || description != null)) {
                                         try {
                                             blogpostList.add(new Blogpost(link, name, description, pubDate, blog));
