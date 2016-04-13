@@ -73,6 +73,26 @@ public class Blog extends DatabaseObject {
         this.feedURL = new URL(feedURL);
         this.rssElementToDBEntry = map;
     }
+    
+    /**
+     * Creates  a new Blog. The statusFlag will be ORIGINAL.
+     * @param primaryKey the primary key of the blog in the database.
+     * @param name the name of the blog.
+     * @param author the author of the blog. Preferably an email address.
+     * @param blogURL string representation of the URL of the blog.
+     * @param feedURL string representation of the URL of the RSS feed.
+     * @param map 
+     * @throws MalformedURLException
+     */
+    public Blog(int primaryKey, String name, String author, String blogURL, String feedURL, HashMap map) throws MalformedURLException {
+        super.setPrimaryKey(primaryKey);
+        this.name = name;
+        this.author = author;
+        this.blogURL = new URL(blogURL);
+        this.feedURL = new URL(feedURL);
+        this.rssElementToDBEntry = map;
+    }
+    
 
     /**
      *
