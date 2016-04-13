@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -62,12 +63,12 @@ public class DBConnection {
      * @return the primary key of of the dbObject in the database.
      * @throws java.sql.SQLException
      */
-    public Integer writeObjectToDatabase(DatabaseObject dbObject) throws SQLException{
+    public Integer writeObjectToDatabase(DatabaseObject dbObject) throws SQLException {
         PreparedStatement statement;
         Integer primaryKey;
         if (dbObject.getClass().equals(Blog.class)) {
-            Blog blog = (Blog)dbObject;
-            switch(blog.getStatusFlag()) {
+            Blog blog = (Blog) dbObject;
+            switch (blog.getStatusFlag()) {
                 case NEW:
                     statement = con.prepareStatement("INSERT INTO tblBlog (blogLink, blogName, feedLink, author) VALUES (?, ?, ?, ?)");
                     statement.setString(1, blog.getBlogURL().toExternalForm());
@@ -91,12 +92,14 @@ public class DBConnection {
                     statement.executeUpdate();
                     blog.setStatusFlag(DatabaseObjectStatus.ORIGINAL);
                     return blog.getPrimaryKey();
-                case ORIGINAL: return blog.getPrimaryKey();
-                default: return null;
+                case ORIGINAL:
+                    return blog.getPrimaryKey();
+                default:
+                    return null;
             }
         } else if (dbObject.getClass().equals(Blogpost.class)) {
             Blogpost blogpost = (Blogpost) dbObject;
-            switch(blogpost.getStatusFlag()) {
+            switch (blogpost.getStatusFlag()) {
                 case NEW:
                     statement = con.prepareStatement("INSERT INTO tblBlogpost (blogpostLink, blogpostName, description, FK_Blog, publicationDateTime) VALUES (?, ?, ?, ?, ?)");
                     statement.setString(1, blogpost.getBlogpostURL().toExternalForm());
@@ -121,8 +124,10 @@ public class DBConnection {
                     statement.executeUpdate();
                     blogpost.setStatusFlag(DatabaseObjectStatus.ORIGINAL);
                     return blogpost.getPrimaryKey();
-                case ORIGINAL: return blogpost.getPrimaryKey();
-                default: return null;
+                case ORIGINAL:
+                    return blogpost.getPrimaryKey();
+                default:
+                    return null;
             }
         } else {
             return null;
@@ -137,16 +142,16 @@ public class DBConnection {
      */
     public static DBConnection getDBCon() {
         try {
-        if (dbCon == null) {
-            int port = Integer.parseInt(EveBlogs.getDefaultConfig().getProperty("DataBaseServerPort"));
-            String serverAddress = EveBlogs.getDefaultConfig().getProperty("DataBaseServerAddress");
-            String dbName = EveBlogs.getDefaultConfig().getProperty("DataBaseName");
-            String user = EveBlogs.getDefaultConfig().getProperty("DataBaseUser");
-            String password = EveBlogs.getDefaultConfig().getProperty("DataBasePassword");
-            dbCon = new DBConnection(serverAddress, port, dbName, user, password);
-        }
-        return dbCon;
-        } catch(MalformedURLException | SQLException ex) {
+            if (dbCon == null) {
+                int port = Integer.parseInt(EveBlogs.getDefaultConfig().getProperty("DataBaseServerPort"));
+                String serverAddress = EveBlogs.getDefaultConfig().getProperty("DataBaseServerAddress");
+                String dbName = EveBlogs.getDefaultConfig().getProperty("DataBaseName");
+                String user = EveBlogs.getDefaultConfig().getProperty("DataBaseUser");
+                String password = EveBlogs.getDefaultConfig().getProperty("DataBasePassword");
+                dbCon = new DBConnection(serverAddress, port, dbName, user, password);
+            }
+            return dbCon;
+        } catch (MalformedURLException | SQLException ex) {
             Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
@@ -162,7 +167,7 @@ public class DBConnection {
     public static DBConnection getInstance() throws MalformedURLException, SQLException {
         return getDBCon();
     }
-    
+
     public Blog getBlogFromDB(int primaryKey) {
         try {
             PreparedStatement statement = this.con.prepareStatement("SELECT feedLink, blogName, blogLink, author, xmlBlogpostName, xmlBlogpostLink, xmlPublicationDateTime, xmlDescription FROM tblBlog WHERE PK_Blog = ?;");
@@ -174,14 +179,14 @@ public class DBConnection {
             String blogLink = rs.getString(3); // the link to the blogs main page
             String author = rs.getString(4); // the author of the blog. prefarably an e-mail address.
             /*
-            * 
-            */
+            
+             */
             HashMap<String, String> map = new HashMap<>();
             map.put("blogpostName", rs.getString("xmlBlogpostName"));
             map.put("blogpostLink", rs.getString("xmlBlogpostLink"));
             map.put("publicationDateTime", rs.getString("xmlPublicationDateTime"));
             map.put("description", rs.getString("xmlDescription"));
-            
+
             Blog blog = new Blog(name, author, blogLink, feedLink, map);
             blog.setPrimaryKey(primaryKey);
             return blog;
@@ -190,11 +195,33 @@ public class DBConnection {
             return null;
         }
     }
-    
+
     public Blog getBlogFromDB(URL url) throws SQLException {
         Statement statement = con.createStatement();
-        ResultSet rs = statement.executeQuery("SELECT PK_Blog FROM tblBlog WHERE blogLink = '" + url +"' OR feedLink = '" + url + "';");
+        ResultSet rs = statement.executeQuery("SELECT PK_Blog FROM tblBlog WHERE blogLink = '" + url + "' OR feedLink = '" + url + "';");
         rs.first();
         return getBlogFromDB(rs.getInt(1));
+    }
+
+    public LinkedList<Blog> getAllActiveBlogs() throws SQLException {
+        LinkedList<Blog> blogList = new LinkedList<>();
+        Statement statement = con.createStatement();
+        String query = "SELECT PK_Blog, blogName, blogLink, feedLink, author, xmlBlogpostName, xmlBlogpostLink, xmlPublicationDateTime, xmlDescription FROM tblblog WHERE active = 1";
+        try (ResultSet rs = statement.executeQuery(query)) {
+            while (rs.next()) {
+                try {
+                    HashMap<String, String> map = new HashMap<>();
+                    map.put("blogpostName", rs.getString("xmlBlogpostName"));
+                    map.put("blogpostLink", rs.getString("xmlBlogpostLink"));
+                    map.put("publicationDateTime", rs.getString("xmlPublicationDateTime"));
+                    map.put("description", rs.getString("xmlDescription"));
+                    
+                    blogList.add(new Blog(rs.getInt("PK_Blog"), rs.getString("blogName"), rs.getString("blogLink"), rs.getString("feedLink"), rs.getString("author"), map));
+                } catch (MalformedURLException ex) {
+                    Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
+        return blogList;
     }
 }
