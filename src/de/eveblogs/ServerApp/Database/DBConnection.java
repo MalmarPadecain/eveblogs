@@ -16,6 +16,7 @@
  */
 package de.eveblogs.ServerApp.Database;
 
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import de.eveblogs.ServerApp.EveBlogs;
 import de.eveblogs.ServerApp.Utilities.Blog;
 import de.eveblogs.ServerApp.Utilities.Blogpost;
@@ -101,19 +102,26 @@ public class DBConnection {
             Blogpost blogpost = (Blogpost) dbObject;
             switch (blogpost.getStatusFlag()) {
                 case NEW:
-                    statement = con.prepareStatement("INSERT INTO tblBlogpost (blogpostLink, blogpostName, description, FK_Blog, publicationDateTime) VALUES (?, ?, ?, ?, ?)");
-                    statement.setString(1, blogpost.getBlogpostURL().toExternalForm());
-                    statement.setString(2, blogpost.getName());
-                    statement.setString(3, blogpost.getDescription());
-                    statement.setInt(4, blogpost.getBlog().getPrimaryKey());
-                    statement.setTimestamp(5, new Timestamp(blogpost.getPubDate().getTime()));
-                    statement.executeUpdate();
-                    ResultSet rs = con.createStatement().executeQuery("SELECT LAST_INSERT_ID();");
-                    rs.first();
-                    primaryKey = rs.getInt(1);
-                    blogpost.setPrimaryKey(primaryKey);
-                    blogpost.setStatusFlag(DatabaseObjectStatus.ORIGINAL);
-                    return primaryKey;
+                    /*
+                    TODO maybe better not to catch MySQLIntegrityConstraintViolationException - seams a bit dirty.
+                    */
+                    try {
+                        statement = con.prepareStatement("INSERT INTO tblBlogpost (blogpostLink, blogpostName, description, FK_Blog, publicationDateTime) VALUES (?, ?, ?, ?, ?)");
+                        statement.setString(1, blogpost.getBlogpostURL().toExternalForm());
+                        statement.setString(2, blogpost.getName());
+                        statement.setString(3, blogpost.getDescription());
+                        statement.setInt(4, blogpost.getBlog().getPrimaryKey());
+                        statement.setTimestamp(5, new Timestamp(blogpost.getPubDate().getTime()));
+                        statement.executeUpdate();
+                        ResultSet rs = con.createStatement().executeQuery("SELECT LAST_INSERT_ID();");
+                        rs.first();
+                        primaryKey = rs.getInt(1);
+                        blogpost.setPrimaryKey(primaryKey);
+                        blogpost.setStatusFlag(DatabaseObjectStatus.ORIGINAL);
+                        return primaryKey;
+                    } catch (MySQLIntegrityConstraintViolationException ex) {
+                        return null;
+                    }
                 case MODIFIED:
                     statement = con.prepareStatement("UPDATE tblBlogpost SET blogpostLink = ?, blogpostName = ?, description = ?, FK_Blog = ?, publicationDateTime = ?");
                     statement.setString(1, blogpost.getBlogpostURL().toExternalForm());
@@ -134,6 +142,9 @@ public class DBConnection {
         }
     }
 
+    /*
+    TODO write an init method to call in start, so that the MalformedURLExeption no longer must be caught every time the database connection is called.
+     */
     /**
      * Returns the database connection. If none has been initialised it is
      * created.
