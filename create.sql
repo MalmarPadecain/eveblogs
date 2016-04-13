@@ -9,6 +9,7 @@ CREATE TABLE tblBlog
     blogLink VARCHAR(200) NOT NULL UNIQUE,
     feedLink VARCHAR(200) NOT NULL UNIQUE, #the link to the RSS feed of the blog
     author VARCHAR(50),
+    active BOOLEAN NOT NULL DEFAULT 1,
     # the xml elements in which the information for the blogpost is stored in the RSS feed
     xmlBlogpostName VARCHAR(30) NOT NULL DEFAULT 'title',
     xmlBlogpostLink VARCHAR(30) NOT NULL DEFAULT 'link',
