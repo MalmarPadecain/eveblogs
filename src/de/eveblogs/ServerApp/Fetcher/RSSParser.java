@@ -56,19 +56,16 @@ public class RSSParser {
         this.dateFormatPattern = new LinkedList<>();
 
         /*
-        TODO test if there are cases that dont't use one of these formats.
-        TODO add this to the propperties file.
-        */
+         * TODO test if there are cases that dont't use one of these formats. TODO add this to the propperties file.
+         */
 //        this.dateFormatPattern.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         this.dateFormatPattern.add("EEE, dd MMM yyyy HH:mm:ss Z");
     }
 
     /**
-     * Parses all blogs in the list given to the constructor and returns the
-     * blogposts in an ArrayList.
+     * Parses all blogs in the list given to the constructor and returns the blogposts in an ArrayList.
      *
-     * @return an ArrayList with at least all blogbosts published later than the
-     * latest blogpost of each blog added to the database. May contain more.
+     * @return an ArrayList with at least all blogbosts published later than the latest blogpost of each blog added to the database. May contain more.
      */
     public LinkedList<Blogpost> getBlogpostList() {
         final LinkedList<Blogpost> blogpostList = new LinkedList<>();
@@ -94,11 +91,11 @@ public class RSSParser {
                     switch (event.getEventType()) {
                         case XMLEvent.START_ELEMENT:
                             StartElement startElement = event.asStartElement();
-                            
+
                             /*
-                            TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a loop in each case.
-                            TODO try to bring this in a bit a more beautiful form.
-                            */
+                             * TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a
+                             * loop in each case. TODO try to bring this in a bit a more beautiful form.
+                             */
                             String elementContent = startElement.getName().toString();
                             if (elementContent.equals("item")) {
                                 itemFlag = true;
@@ -116,9 +113,8 @@ public class RSSParser {
                                 }
                             } else if (elementContent.equals(blog.getElementName("publicationDateTime"))) {
                                 /*
-                                tries to parse the date with all formatters in this.formatterList. 
-                                if all fail the current time is set and  a warning logged.
-                                */
+                                 * tries to parse the date with all formatters in this.formatterList. if all fail the current time is set and a warning logged.
+                                 */
                                 if (itemFlag) {
                                     try {
 //                                        dateFormat.applyPattern(dateFormatPattern.get(0));
@@ -142,8 +138,9 @@ public class RSSParser {
                                 case "item":
                                     itemFlag = false;
                                     /*
-                                    creates a new Blogpost if there is a link and either a name or a descripion. These Elements must be present for it to be a validate RSS document according to the RSS specifications 2.0
-                                    */
+                                     * creates a new Blogpost if there is a link and either a name or a descripion. These Elements must be present for it to be
+                                     * a validate RSS document according to the RSS specifications 2.0
+                                     */
                                     if (link != null && (name != null || description != null)) {
                                         try {
                                             blogpostList.add(new Blogpost(link, name, description, pubDate, blog));
@@ -153,7 +150,7 @@ public class RSSParser {
                                     }
 
                                     /*
-                                    * sets all variables back to NULL
+                                     * sets all variables back to NULL
                                      */
                                     name = null;
                                     link = null;

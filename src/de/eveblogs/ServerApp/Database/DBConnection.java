@@ -103,8 +103,8 @@ public class DBConnection {
             switch (blogpost.getStatusFlag()) {
                 case NEW:
                     /*
-                    TODO maybe better not to catch MySQLIntegrityConstraintViolationException - seams a bit dirty.
-                    */
+                     * TODO maybe better not to catch MySQLIntegrityConstraintViolationException - seams a bit dirty.
+                     */
                     try {
                         statement = con.prepareStatement("INSERT INTO tblBlogpost (blogpostLink, blogpostName, description, FK_Blog, publicationDateTime) VALUES (?, ?, ?, ?, ?)");
                         statement.setString(1, blogpost.getBlogpostURL().toExternalForm());
@@ -143,11 +143,14 @@ public class DBConnection {
     }
 
     /*
-    TODO write an init method to call in start, so that the MalformedURLExeption no longer must be caught every time the database connection is called.
+     * TODO write an init method to call in start, so that the MalformedURLExeption no longer must be caught every time the database connection is called.
      */
+    public static void initDBConnection() throws MalformedURLException, SQLException {
+
+    }
+
     /**
-     * Returns the database connection. If none has been initialised it is
-     * created.
+     * Returns the database connection. If none has been initialised it is created.
      *
      * @return the database connection
      * @throws java.net.MalformedURLException
@@ -187,7 +190,7 @@ public class DBConnection {
             String blogLink = rs.getString(3); // the link to the blogs main page
             String author = rs.getString(4); // the author of the blog. prefarably an e-mail address.
             /*
-            
+             *
              */
             HashMap<String, String> map = new HashMap<>();
             map.put("blogpostName", rs.getString("xmlBlogpostName"));

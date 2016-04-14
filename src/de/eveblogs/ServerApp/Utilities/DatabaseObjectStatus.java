@@ -18,6 +18,7 @@ package de.eveblogs.ServerApp.Utilities;
 
 /**
  * This enum represents the relation of the object to the representing object in the database.
+ *
  * @author Malmar Padecain
  */
 public enum DatabaseObjectStatus {
@@ -26,8 +27,7 @@ public enum DatabaseObjectStatus {
      */
     NEW,
     /**
-     * The Objet exists in the database and has been modified. It needs to be
-     * updated.
+     * The Objet exists in the database and has been modified. It needs to be updated.
      */
     MODIFIED,
     /**
@@ -35,8 +35,7 @@ public enum DatabaseObjectStatus {
      */
     ORIGINAL,
     /**
-     * The Object has been deleted from the database. There exists no
-     * representing object in the database.
+     * The Object has been deleted from the database. There exists no representing object in the database.
      */
     DELETED
 }

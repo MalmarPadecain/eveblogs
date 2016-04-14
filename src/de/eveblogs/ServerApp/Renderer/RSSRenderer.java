@@ -37,12 +37,13 @@ import javax.xml.stream.XMLStreamException;
  * @author Malmar Padecain
  */
 public class RSSRenderer {
+
     private final ArrayList<Blogpost> blogpostList;
     private final Path locationOfRSSHeader;
     private final Path targetLocation;
-    
+
     /**
-     * 
+     *
      * @param list the list with the blogposts that will be writen to the feed.
      */
     public RSSRenderer(ArrayList<Blogpost> list) {
@@ -50,48 +51,51 @@ public class RSSRenderer {
         this.locationOfRSSHeader = Paths.get(EveBlogs.getDefaultConfig().getProperty("locationOfRSSHeader"));
         this.targetLocation = Paths.get(EveBlogs.getDefaultConfig().getProperty("targetLocation"));
     }
-    
+
     /**
      * Outputs the RSS feed to the location specified in the config.properties with the header specefied at the same location.
+     *
      * @throws IOException in case the RSS Header could not be copied to the target location.
-     * @throws XMLStreamException 
+     * @throws XMLStreamException
      */
     public void createFeed() throws IOException, XMLStreamException {
-        //copy header to output and append.
+        /*
+         * copy header to output and append.
+         */
         Files.copy(locationOfRSSHeader, targetLocation, StandardCopyOption.REPLACE_EXISTING);
         XMLEventWriter writer = XMLOutputFactory.newFactory().createXMLEventWriter(new FileOutputStream(targetLocation.toFile(), true));
-        
-        for(Blogpost blogpost : blogpostList) {
+
+        for (Blogpost blogpost : blogpostList) {
             parseBlogpost(blogpost, writer);
         }
         writer.flush();
         writer.close();
-        
+
         //Adding closing tags to file.
         FileWriter fileWriter = new FileWriter(targetLocation.toFile(), true);
         fileWriter.write("</channel></rss>");
         fileWriter.flush();
         fileWriter.close();
     }
-    
-    private void parseBlogpost(Blogpost blogpost, XMLEventWriter writer) throws XMLStreamException{
+
+    private void parseBlogpost(Blogpost blogpost, XMLEventWriter writer) throws XMLStreamException {
         XMLEventFactory factory = XMLEventFactory.newFactory();
         writer.add(factory.createStartElement(new QName("item"), null, null));
-        
+
         writer.add(factory.createStartElement(new QName("title"), null, null));
         writer.add(factory.createCharacters(blogpost.getName()));
         writer.add(factory.createEndElement(new QName("title"), null));
-        
+
         writer.add(factory.createStartElement(new QName("link"), null, null));
         writer.add(factory.createCharacters(blogpost.getBlogpostURL().toString()));
         writer.add(factory.createEndElement(new QName("link"), null));
-        
+
         writer.add(factory.createStartElement(new QName("description"), null, null));
         writer.add(factory.createCharacters(blogpost.getDescription()));
         writer.add(factory.createEndElement(new QName("description"), null));
-        
+
         writer.add(factory.createEndElement(new QName("item"), null));
-        
+
         writer.flush();
     }
 }

@@ -26,9 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A class representing a blogpost. It contains methods to create a blogpost
- * from the database, write a blogpost to the database and manipualating a
- * blogpost in the database.
+ * A class representing a blogpost. It contains methods to create a blogpost from the database, write a blogpost to the database and manipualating a blogpost in
+ * the database.
  *
  * @author Malmar Padecain
  */
@@ -41,8 +40,7 @@ public class Blogpost extends DatabaseObject {
     private Blog blog;
 
     /**
-     * Creates a new representation of a blog from the data base. StatusFlag
-     * will be ORIGINAL.
+     * Creates a new representation of a blog from the data base. StatusFlag will be ORIGINAL.
      *
      * @param primaryKey the primary key of the post in the database
      */
@@ -100,8 +98,7 @@ public class Blogpost extends DatabaseObject {
      * Sets the blogpostURL.
      *
      * @param blogpostURL string representation of the URL of the blogpost.
-     * @throws MalformedURLException if the given string cannot be parsed to a
-     * URL.
+     * @throws MalformedURLException if the given string cannot be parsed to a URL.
      */
     public void setBlogpostURL(String blogpostURL) throws MalformedURLException {
         this.blogpostURL = new URL(blogpostURL);

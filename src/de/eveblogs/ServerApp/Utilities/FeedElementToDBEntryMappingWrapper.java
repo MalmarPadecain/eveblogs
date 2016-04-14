@@ -19,8 +19,7 @@ package de.eveblogs.ServerApp.Utilities;
 import java.util.HashMap;
 
 /**
- * This class is a wrapper for a HashMap that maps the Elements used in the RSS
- * feed of a blog to the database columns.
+ * This class is a wrapper for a HashMap that maps the Elements used in the RSS feed of a blog to the database columns.
  *
  * @author Malmar Padecain
  */
@@ -34,8 +33,7 @@ public class FeedElementToDBEntryMappingWrapper {
 
     /**
      *
-     * @param entries an array of strings in the form of Key, Value, Key,
-     * Value...
+     * @param entries an array of strings in the form of Key, Value, Key, Value...
      */
     public FeedElementToDBEntryMappingWrapper(String... entries) {
         this();
@@ -53,7 +51,7 @@ public class FeedElementToDBEntryMappingWrapper {
         this();
         this.FeedElementToDBEntry.putAll(map);
     }
-    
+
     public String getEntry(String key) {
         return this.FeedElementToDBEntry.get(key);
     }

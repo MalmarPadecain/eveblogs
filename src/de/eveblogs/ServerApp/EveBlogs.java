@@ -38,16 +38,14 @@ public class EveBlogs {
     private static DBConnection connection;
 
     /**
-     * Starts the Application. The Application will terminate imediately with
-     * exit status 1 if the properties file cannot be opend or read.
+     * Starts the Application. The Application will terminate imediately with exit status 1 if the properties file cannot be opend or read.
      *
-     * @param args the comand line arguments. "-fetch" to fetch the RSS feeds
-     * without creating new feed. "-create" to create a new feed without
-     * fetching first. Leave empty to do both.
+     * @param args the comand line arguments. "-fetch" to fetch the RSS feeds without creating new feed. "-create" to create a new feed without fetching first.
+     * Leave empty to do both.
      */
     public static void main(String[] args) {
         /*
-        reads the default configuration from file. If this fais the Application is terminated.
+         * reads the default configuration from file. If this fais the Application is terminated.
          */
         try {
             defaultConfig = new Configuration("eveblogs.properties");
@@ -57,7 +55,7 @@ public class EveBlogs {
         }
 
         /*
-        establishes the connection to the database
+         * establishes the connection to the database
          */
         try {
             connection = DBConnection.getInstance();
@@ -88,40 +86,6 @@ public class EveBlogs {
             }
         }
         createFeed();
-
-        /*
-        the following is code for testing purposes.
-         */
- /*
-        ArrayList<Blog> blogList = new ArrayList<>(1);
-        try {
-            HashMap<String, String> map = new HashMap<>();
-            map.put("xmlBlogpostName", "title");
-            map.put("xmlBlogpostLink", "link");
-            map.put("xmlPublicationDateTime", "pubDate");
-            map.put("xmlDescription", "description");
-
-            blogList.add(new Blog("gsc", "Jezaja", "http://giantsecurecontainer.de/", "http://giantsecurecontainer.de/feed/", map));
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(EveBlogs.class.getName()).log(Level.INFO, null, ex);
-        }
-        for (Blog blog : blogList) {
-            try {
-                DBConnection.getDBCon().writeObjectToDatabase(blog);
-            } catch (SQLException ex) {
-                Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-        RSSParser testParser = new RSSParser(blogList);
-        ArrayList<Blogpost> list = testParser.getBlogpostList();
-        for (Blogpost blogpost : list) {
-            try {
-                DBConnection.getDBCon().writeObjectToDatabase(blogpost);
-            } catch (SQLException ex) {
-                Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-         */
     }
 
     private static void fetchFeed() throws SQLException {

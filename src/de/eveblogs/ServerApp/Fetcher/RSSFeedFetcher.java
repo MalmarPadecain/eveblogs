@@ -27,16 +27,16 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 
 /**
- * This class provides some static methods to get the feeds. 
+ * This class provides some static methods to get the feeds.
+ *
  * @author Malmar Padecain
  */
 public class RSSFeedFetcher {
 
     /**
-     * 
+     *
      * @param blog the blog to get the feed from.
-     * @return a reader on the given URL or null in case the blog had no feed
-     * location specefied or error.
+     * @return a reader on the given URL or null in case the blog had no feed location specefied or error.
      */
     public static XMLEventReader getRSSFeed(Blog blog) {
         if (blog.getFeedURL() != null) {
@@ -50,8 +50,7 @@ public class RSSFeedFetcher {
      *
      * @param url a string representing the URL to the feed.
      * @return a reader on to the given URL or null in case of error.
-     * @throws MalformedURLException if the given string cannot be parsed to a
-     * URL.
+     * @throws MalformedURLException if the given string cannot be parsed to a URL.
      */
     public static XMLEventReader getRSSFeed(String url) throws MalformedURLException {
         return getRSSFeed(new URL(url));

@@ -29,22 +29,23 @@ public abstract class DatabaseObject {
 
     /**
      * Returns the current status of this Object.
+     *
      * @return the current status of this Object.
      */
     public DatabaseObjectStatus getStatusFlag() {
         return this.statusFlag;
     }
-    
+
     /**
-     * 
+     *
      * @return the primary key in the database. Null if not existing
      */
     public Integer getPrimaryKey() {
         return this.primaryKey;
     }
-    
+
     /**
-     * 
+     *
      * @param primaryKey the new primary key.
      */
     public void setPrimaryKey(Integer primaryKey) {
@@ -53,8 +54,7 @@ public abstract class DatabaseObject {
     }
 
     /**
-     * The default contstructor creates a new instance with primaryKey = null
-     * and statusFlag = NEW.
+     * The default contstructor creates a new instance with primaryKey = null and statusFlag = NEW.
      */
     public DatabaseObject() {
         this.primaryKey = null;
@@ -62,8 +62,7 @@ public abstract class DatabaseObject {
     }
 
     /**
-     * Creates a new instance with the given primary key an statusFlag =
-     * ORIGINAL.
+     * Creates a new instance with the given primary key an statusFlag = ORIGINAL.
      *
      * @param primaryKey the primaryKey of the Obect in the database.
      */

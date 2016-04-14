@@ -26,9 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This class represents a blog. It contains methods to create a blog from the
- * database, write a blog to the database and manipualating a blog in the
- * database.
+ * This class represents a blog. It contains methods to create a blog from the database, write a blog to the database and manipualating a blog in the database.
  *
  * @author Malmar Padecain
  */
@@ -40,13 +38,12 @@ public class Blog extends DatabaseObject {
     private String author;
     private Date lastUpdate;
     private HashMap<String, String> rssElementToDBEntry;
+
     /*
-    * TODO implement the Mapping from RSS Elements to DB entrys either with the FeedElementToDBEntryMappingWrapper or a simple HashMap.
-    */
-    
+     * TODO implement the Mapping from RSS Elements to DB entrys either with the FeedElementToDBEntryMappingWrapper or a simple HashMap.
+     */
     /**
-     * Creates a new representation of a blog from the data base. StatusFlag
-     * will be ORIGINAL.
+     * Creates a new representation of a blog from the data base. StatusFlag will be ORIGINAL.
      *
      * @param primaryKey the primary key of the blog in the data base.
      * @throws java.sql.SQLException
@@ -67,8 +64,7 @@ public class Blog extends DatabaseObject {
      * @param blogURL string representation of the URL of the blog.
      * @param feedURL string representation of the URL of the RSS feed.
      * @param map
-     * @throws MalformedURLException if the last two given strings can not be
-     * parsed to an URL.
+     * @throws MalformedURLException if the last two given strings can not be parsed to an URL.
      */
     public Blog(String name, String author, String blogURL, String feedURL, HashMap map) throws MalformedURLException {
         this.name = name;
@@ -77,15 +73,16 @@ public class Blog extends DatabaseObject {
         this.feedURL = new URL(feedURL);
         this.rssElementToDBEntry = map;
     }
-    
+
     /**
-     * Creates  a new Blog. The statusFlag will be ORIGINAL.
+     * Creates a new Blog. The statusFlag will be ORIGINAL.
+     *
      * @param primaryKey the primary key of the blog in the database.
      * @param name the name of the blog.
      * @param author the author of the blog. Preferably an email address.
      * @param blogURL string representation of the URL of the blog.
      * @param feedURL string representation of the URL of the RSS feed.
-     * @param map 
+     * @param map
      * @throws MalformedURLException
      */
     public Blog(int primaryKey, String name, String author, String blogURL, String feedURL, HashMap map) throws MalformedURLException {
@@ -96,17 +93,15 @@ public class Blog extends DatabaseObject {
         this.feedURL = new URL(feedURL);
         this.rssElementToDBEntry = map;
     }
-    
 
     /**
      *
-     * @return the date and time, when feed of the blog was last fetched and
-     * writen to the database.
+     * @return the date and time, when feed of the blog was last fetched and writen to the database.
      */
     public Date getLastUpdate() {
         return lastUpdate;
     }
-    
+
     /**
      * Sets the last update time to the current time and date.
      */
@@ -117,8 +112,7 @@ public class Blog extends DatabaseObject {
 
     /**
      *
-     * @param lastUpdate the time and date when the Blog was last updated in the
-     * database.
+     * @param lastUpdate the time and date when the Blog was last updated in the database.
      */
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
@@ -136,8 +130,7 @@ public class Blog extends DatabaseObject {
     /**
      *
      * @param blogURL string representation of the URL.
-     * @throws MalformedURLException if the given string cannot be parsed to a
-     * URL.
+     * @throws MalformedURLException if the given string cannot be parsed to a URL.
      */
     public void setBlogURL(String blogURL) throws MalformedURLException {
         this.blogURL = new URL(blogURL);
@@ -155,8 +148,7 @@ public class Blog extends DatabaseObject {
     /**
      *
      * @param feedURL string representation of the URL.
-     * @throws MalformedURLException if the given string cannot be parsed to a
-     * URL.
+     * @throws MalformedURLException if the given string cannot be parsed to a URL.
      */
     public void setFeedURL(String feedURL) throws MalformedURLException {
         this.feedURL = new URL(feedURL);
@@ -196,9 +188,9 @@ public class Blog extends DatabaseObject {
         this.author = author;
         this.setStatusFlag(DatabaseObjectStatus.MODIFIED);
     }
-    
+
     /**
-     * 
+     *
      * @param key the column name in the database
      * @return the tag in the rss feed.
      */
@@ -221,7 +213,7 @@ public class Blog extends DatabaseObject {
     public void deleteFromDatabase() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
+
     @Override
     public String toString() {
         return this.name + ": " + this.blogURL.toExternalForm() + " (" + this.feedURL.toExternalForm() + ")";

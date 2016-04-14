@@ -40,9 +40,10 @@ public class Configuration {
             defaultProps.load(in);
         }
     }
-    
+
     /**
      * Gives access to the values in the Property. look java.util.Properties
+     *
      * @param key the property key.
      * @return the value behind the given key. Null if there is no such key.
      */
