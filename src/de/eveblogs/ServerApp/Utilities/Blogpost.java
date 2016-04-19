@@ -145,7 +145,7 @@ public class Blogpost extends DatabaseObject {
         DatabaseObjectStatus oldStatusFlag = getStatusFlag();
         try {
             DBConnection.getDBCon().writeObjectToDatabase(this);
-        } catch (SQLException | MalformedURLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(Blogpost.class.getName()).log(Level.WARNING, null, ex);
             this.setStatusFlag(oldStatusFlag);
         }
@@ -156,4 +156,8 @@ public class Blogpost extends DatabaseObject {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public String toString() {
+        return this.getName() + " at " + this.getPubDate() + " from Blog: (" + this.getBlog().toString() + ")";
+    }
 }
