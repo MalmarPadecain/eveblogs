@@ -42,8 +42,7 @@ CREATE TABLE tblBlogpost
 DELIMITER $$
 CREATE PROCEDURE getLatestBlogposts (IN numberOfPosts INTEGER UNSIGNED)
 BEGIN
-	SELECT tblBlog.blogName, tblBlog.blogLink, tblBlog.feedLink, tblBlogpost.blogpostName, tblBlogpost.blogpostLink, tblBlogpost.description, tblBlogpost.publicationDateTime
-    FROM tblBlogpost INNER JOIN tblBlog ON tblBlog.PK_Blog = tblBlogpost.FK_Blog
+	SELECT PK_Blogpost, FK_Blog, blogpostName, blogpostLink, publicationDateTime, description FROM tblBlogpost
 	ORDER BY publicationDateTime DESC LIMIT numberOfPosts;
 END$$
 DELIMITER ;
