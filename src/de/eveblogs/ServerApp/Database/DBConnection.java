@@ -201,7 +201,7 @@ public class DBConnection {
     public LinkedList<Blog> getAllActiveBlogs() throws SQLException {
         LinkedList<Blog> blogList = new LinkedList<>();
         Statement statement = con.createStatement();
-        String query = "SELECT PK_Blog, blogName, blogLink, feedLink, author, lastUpdate, xmlBlogpostName, xmlBlogpostLink, xmlPublicationDateTime, xmlDescription FROM tblBlog WHERE active = 1";
+        String query = "SELECT PK_Blog, blogName, blogLink, feedLink, author, xmlBlogpostName, xmlBlogpostLink, xmlPublicationDateTime, xmlDescription FROM tblBlog WHERE active = 1";
         try (ResultSet rs = statement.executeQuery(query)) {
             while (rs.next()) {
                 try {
