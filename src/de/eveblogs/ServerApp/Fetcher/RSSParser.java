@@ -56,9 +56,9 @@ public class RSSParser {
         this.dateFormatPattern = new LinkedList<>();
 
         /*
-         * TODO test if there are cases that dont't use one of these formats. TODO add this to the propperties file.
+         * TODO test if there are cases that dont't use one of these formats. TODO add the DateFormat list to the propperties file.
          */
-//        this.dateFormatPattern.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+        this.dateFormatPattern.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
         this.dateFormatPattern.add("EEE, dd MMM yyyy HH:mm:ss Z");
     }
 
@@ -71,12 +71,14 @@ public class RSSParser {
         final LinkedList<Blogpost> blogpostList = new LinkedList<>();
         for (Blog blog : blogList) {
             blogpostList.addAll(parseBlogposts(blog));
+            blog.setLastUpdate();
+            blog.writeToDatabase();
         }
         return blogpostList;
     }
 
-    private ArrayList<Blogpost> parseBlogposts(Blog blog) {
-        final ArrayList<Blogpost> blogpostList = new ArrayList<>(2);
+    private LinkedList<Blogpost> parseBlogposts(Blog blog) {
+        final LinkedList<Blogpost> blogpostList = new LinkedList<>();
         XMLEventReader reader = RSSFeedFetcher.getRSSFeed(blog);
         if (reader != null) {
             try {
@@ -85,6 +87,8 @@ public class RSSParser {
                 String link = null;
                 String description = null;
                 Date pubDate = null;
+
+                loop: // labels the loop to jump out of it when no new blogposts are there to be parsed.
                 while (reader.hasNext()) {
                     XMLEvent event = reader.nextEvent();
 
@@ -94,7 +98,7 @@ public class RSSParser {
 
                             /*
                              * TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a
-                             * loop in each case. TODO try to bring this in a bit a more beautiful form.
+                             * loop in each case. TODO try to bring this in a bit nicer form.
                              */
                             String elementContent = startElement.getName().toString();
                             if (elementContent.equals("item")) {
@@ -116,17 +120,27 @@ public class RSSParser {
                                  * tries to parse the date with all formatters in this.formatterList. if all fail the current time is set and a warning logged.
                                  */
                                 if (itemFlag) {
-                                    try {
-//                                        dateFormat.applyPattern(dateFormatPattern.get(0));
-                                        pubDate = dateFormat.parse(reader.peek().asCharacters().toString());
-                                    } catch (ParseException ex) {
+
+                                    for (String dateFormatString : dateFormatPattern) {
+                                        dateFormat.applyPattern(dateFormatString);
                                         try {
-                                            dateFormat.applyPattern(dateFormatPattern.get(0));
                                             pubDate = dateFormat.parse(reader.peek().asCharacters().toString());
-                                        } catch (ParseException ex1) {
-                                            Logger.getLogger(RSSParser.class.getName()).log(Level.WARNING, "Blog " + blog + " uses unsupported DateTime format", ex);
-                                            pubDate = new Date();
+                                        } catch (ParseException ex) {
+                                            continue;  // cycle through
                                         }
+                                        break; // if parsing was successful break out
+                                    }
+                                    
+                                    /*
+                                     * as soon as a date is parsed that is before the last update of the blog the rest of the file is skipped.
+                                     */
+                                    if((pubDate != null) && (blog.getLastUpdate() != null) && pubDate.before(blog.getLastUpdate())) {
+                                        blog.setLastUpdate(new Date());
+                                        break loop;
+                                    }
+                                    if(pubDate == null) {
+                                        pubDate = new Date();
+                                        Logger.getLogger(RSSParser.class.getName()).log(Level.WARNING, "Blog {0} uses unsupported DateTime format", blog);
                                     }
                                 }
                             }

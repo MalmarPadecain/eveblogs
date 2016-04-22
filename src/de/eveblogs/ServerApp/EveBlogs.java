@@ -18,6 +18,7 @@ package de.eveblogs.ServerApp;
 
 import de.eveblogs.ServerApp.Database.DBConnection;
 import de.eveblogs.ServerApp.Fetcher.RSSParser;
+import de.eveblogs.ServerApp.Renderer.RSSRenderer;
 import de.eveblogs.ServerApp.Utilities.Blog;
 import de.eveblogs.ServerApp.Utilities.Blogpost;
 import de.eveblogs.ServerApp.Utilities.Configuration;
@@ -27,6 +28,7 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.stream.XMLStreamException;
 
 /**
  *
@@ -35,7 +37,6 @@ import java.util.logging.Logger;
 public class EveBlogs {
 
     private static Configuration defaultConfig;
-    private static DBConnection connection;
 
     /**
      * Starts the Application. The Application will terminate imediately with exit status 1 if the properties file cannot be opend or read.
@@ -55,10 +56,10 @@ public class EveBlogs {
         }
 
         /*
-         * establishes the connection to the database
+         * initialises the connection to the database
          */
         try {
-            connection = DBConnection.getInstance();
+            DBConnection.initConnection();
         } catch (MalformedURLException | SQLException ex) {
             Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, "Faild to connect to the database.", ex);
             System.exit(2);
@@ -75,7 +76,11 @@ public class EveBlogs {
                     }
                     break;
                 case "-create":
-                    createFeed();
+                    try {
+                        createFeed();
+                    } catch (Exception ex) {
+                        Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                     break;
             }
         } else {
@@ -85,25 +90,26 @@ public class EveBlogs {
                 Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        createFeed();
-    }
-
-    private static void fetchFeed() throws SQLException {
-        LinkedList<Blog> blogList = connection.getAllActiveBlogs();
-        RSSParser parser = new RSSParser(blogList);
-        LinkedList<Blogpost> blogpostList = parser.getBlogpostList();
-        for (Blogpost blogpost : blogpostList) {
-            try {
-                connection.writeObjectToDatabase(blogpost);
-            } catch (SQLException ex) {
-                Logger.getLogger(EveBlogs.class
-                        .getName()).log(Level.SEVERE, null, ex);
-            }
+        try {
+            createFeed();
+        } catch (Exception ex) {
+            Logger.getLogger(EveBlogs.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
-    private static void createFeed() {
-        // TODO write this
+    private static void fetchFeed() throws SQLException {
+        LinkedList<Blog> blogList = DBConnection.getDBCon().getAllActiveBlogs();
+        RSSParser parser = new RSSParser(blogList);
+        LinkedList<Blogpost> blogpostList = parser.getBlogpostList();
+        for (Blogpost blogpost : blogpostList) {
+            DBConnection.getDBCon().writeObjectToDatabase(blogpost);
+        }
+    }
+
+    private static void createFeed() throws SQLException, IOException, XMLStreamException {
+        LinkedList<Blogpost> list = DBConnection.getDBCon().getLatestBlogposts(50);
+        RSSRenderer renderer = new RSSRenderer(list);
+        renderer.createFeed();
     }
 
     /**

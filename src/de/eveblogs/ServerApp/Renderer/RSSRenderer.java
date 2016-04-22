@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
 import javax.xml.stream.XMLEventWriter;
@@ -38,7 +39,7 @@ import javax.xml.stream.XMLStreamException;
  */
 public class RSSRenderer {
 
-    private final ArrayList<Blogpost> blogpostList;
+    private final LinkedList<Blogpost> blogpostList;
     private final Path locationOfRSSHeader;
     private final Path targetLocation;
 
@@ -46,7 +47,7 @@ public class RSSRenderer {
      *
      * @param list the list with the blogposts that will be writen to the feed.
      */
-    public RSSRenderer(ArrayList<Blogpost> list) {
+    public RSSRenderer(LinkedList<Blogpost> list) {
         this.blogpostList = list;
         this.locationOfRSSHeader = Paths.get(EveBlogs.getDefaultConfig().getProperty("locationOfRSSHeader"));
         this.targetLocation = Paths.get(EveBlogs.getDefaultConfig().getProperty("targetLocation"));

@@ -39,9 +39,6 @@ public class Blog extends DatabaseObject {
     private Date lastUpdate;
     private HashMap<String, String> rssElementToDBEntry;
 
-    /*
-     * TODO implement the Mapping from RSS Elements to DB entrys either with the FeedElementToDBEntryMappingWrapper or a simple HashMap.
-     */
     /**
      * Creates a new representation of a blog from the data base. StatusFlag will be ORIGINAL.
      *
@@ -49,11 +46,7 @@ public class Blog extends DatabaseObject {
      * @throws java.sql.SQLException
      */
     public Blog(int primaryKey) throws SQLException {
-        try {
-            DBConnection.getDBCon().getBlogFromDB(primaryKey);
-        } catch (MalformedURLException ex) {
-            Logger.getLogger(Blog.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        DBConnection.getDBCon().getBlogFromDB(primaryKey);
     }
 
     /**
@@ -203,7 +196,7 @@ public class Blog extends DatabaseObject {
         DatabaseObjectStatus oldStatusFlag = getStatusFlag();
         try {
             DBConnection.getDBCon().writeObjectToDatabase(this);
-        } catch (SQLException | MalformedURLException ex) {
+        } catch (SQLException ex) {
             Logger.getLogger(Blogpost.class.getName()).log(Level.WARNING, null, ex);
             this.setStatusFlag(oldStatusFlag);
         }

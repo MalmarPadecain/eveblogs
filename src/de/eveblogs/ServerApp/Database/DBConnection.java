@@ -31,6 +31,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.logging.Level;
@@ -237,5 +238,29 @@ public class DBConnection {
         map.put("publicationDateTime", rs.getString("xmlPublicationDateTime"));
         map.put("description", rs.getString("xmlDescription"));
         return map;
+    }
+    
+    public LinkedList<Blogpost> getLatestBlogposts(int number) throws SQLException{
+        LinkedList<Blogpost> blogpostList = new LinkedList<>();
+        String query = "{call getLatestBlogposts(?)}";
+        PreparedStatement statement = this.con.prepareCall(query);
+        statement.setInt(1, number);
+        ResultSet rs = statement.executeQuery();
+        while(rs.next()){
+            int keyBlogpost = rs.getInt("PK_Blogpost");
+            int keyBlog = rs.getInt("FK_Blog");
+            String name = rs.getString("blogpostName");
+            String link = rs.getString("blogpostLink");
+            Date pubDate = rs.getTimestamp("publicationDateTime");
+            String description = rs.getString("description");
+            Blog blog = new Blog(keyBlog);
+            try {
+                Blogpost blogpost =  new Blogpost(link, name, description, pubDate, blog);
+                blogpostList.add(blogpost);
+            } catch (MalformedURLException ex) {
+                Logger.getLogger(DBConnection.class.getName()).log(Level.WARNING, null, ex);
+            }
+        }
+        return blogpostList;
     }
 }
