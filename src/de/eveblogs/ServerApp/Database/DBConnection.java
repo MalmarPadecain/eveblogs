@@ -171,7 +171,7 @@ public class DBConnection {
 
     public Blog getBlogFromDB(int primaryKey) {
         try {
-            PreparedStatement statement = this.con.prepareStatement("SELECT feedLink, blogName, blogLink, author, xmlBlogpostName, xmlBlogpostLink, xmlPublicationDateTime, xmlDescription FROM tblBlog WHERE PK_Blog = ?;");
+            PreparedStatement statement = this.con.prepareStatement("SELECT feedLink, blogName, blogLink, author, lastUpdate, xmlBlogpostName, xmlBlogpostLink, xmlPublicationDateTime, xmlDescription FROM tblBlog WHERE PK_Blog = ?;");
             statement.setInt(1, primaryKey);
             Blog blog;
             try (ResultSet rs = statement.executeQuery()) {
@@ -180,8 +180,10 @@ public class DBConnection {
                 String name = rs.getString("blogName"); // the name of the blog
                 String blogLink = rs.getString("blogLink"); // the link to the blogs main page
                 String author = rs.getString("author"); // the author of the blog. prefarably an e-mail address.
+                Date lastUpdate = rs.getTimestamp("lastUpdate");
                 HashMap<String, String> map = createMap(rs);
                 blog = new Blog(name, author, blogLink, feedLink, map);
+                blog.setLastUpdate(lastUpdate);
                 blog.setPrimaryKey(primaryKey);
             }
             return blog;
@@ -201,7 +203,7 @@ public class DBConnection {
     public LinkedList<Blog> getAllActiveBlogs() throws SQLException {
         LinkedList<Blog> blogList = new LinkedList<>();
         Statement statement = con.createStatement();
-        String query = "SELECT PK_Blog, blogName, blogLink, feedLink, author, xmlBlogpostName, xmlBlogpostLink, xmlPublicationDateTime, xmlDescription FROM tblBlog WHERE active = 1";
+        String query = "SELECT PK_Blog, blogName, blogLink, feedLink, author, lastUpdate, xmlBlogpostName, xmlBlogpostLink, xmlPublicationDateTime, xmlDescription FROM tblBlog WHERE active = 1";
         try (ResultSet rs = statement.executeQuery(query)) {
             while (rs.next()) {
                 try {
@@ -215,8 +217,11 @@ public class DBConnection {
                     String author = rs.getString("author");
                     String blogLink = rs.getString("blogLink");
                     String feedLink = rs.getString("feedLink");
+                    Date lastUpdate = rs.getTimestamp("lastupdate");
                     
-                    blogList.add(new Blog(primaryKey, blogName, author, blogLink, feedLink, map));
+                    Blog blog = new Blog(primaryKey, blogName, author, blogLink, feedLink, map);
+                    blog.setLastUpdate(lastUpdate);
+                    blogList.add(blog);
                 } catch (MalformedURLException ex) {
                     Logger.getLogger(DBConnection.class.getName()).log(Level.SEVERE, null, ex);
                 }
