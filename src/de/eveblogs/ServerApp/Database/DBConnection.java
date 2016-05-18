@@ -103,9 +103,6 @@ public class DBConnection {
             Blogpost blogpost = (Blogpost) dbObject;
             switch (blogpost.getStatusFlag()) {
                 case NEW:
-                    /*
-                     * TODO check for the last time the blog was processed. only write recent blogposts to db
-                     */
                     try {
                         statement = con.prepareStatement("INSERT INTO tblBlogpost (blogpostLink, blogpostName, description, FK_Blog, publicationDateTime) VALUES (?, ?, ?, ?, ?)");
                         statement.setString(1, blogpost.getBlogpostURL().toExternalForm());
@@ -151,11 +148,11 @@ public class DBConnection {
      */
     public static void initConnection() throws MalformedURLException, SQLException {
         if (dbCon == null) {
-            int port = Integer.parseInt(EveBlogs.getDefaultConfig().getProperty("DataBaseServerPort"));
-            String serverAddress = EveBlogs.getDefaultConfig().getProperty("DataBaseServerAddress");
-            String dbName = EveBlogs.getDefaultConfig().getProperty("DataBaseName");
-            String user = EveBlogs.getDefaultConfig().getProperty("DataBaseUser");
-            String password = EveBlogs.getDefaultConfig().getProperty("DataBasePassword");
+            int port = Integer.parseInt(EveBlogs.getDefaultConfig().getProperty("DatabaseServerPort"));
+            String serverAddress = EveBlogs.getDefaultConfig().getProperty("DatabaseServerAddress");
+            String dbName = EveBlogs.getDefaultConfig().getProperty("DatabaseName");
+            String user = EveBlogs.getDefaultConfig().getProperty("DatabaseUser");
+            String password = EveBlogs.getDefaultConfig().getProperty("DatabasePassword");
             dbCon = new DBConnection(serverAddress, port, dbName, user, password);
         }
     }
@@ -180,7 +177,7 @@ public class DBConnection {
                 String name = rs.getString("blogName"); // the name of the blog
                 String blogLink = rs.getString("blogLink"); // the link to the blogs main page
                 String author = rs.getString("author"); // the author of the blog. prefarably an e-mail address.
-                Date lastUpdate = rs.getTimestamp("lastUpdate");
+                Date lastUpdate = rs.getTimestamp("lastUpdate"); // the last time this blog was used
                 HashMap<String, String> map = createMap(rs);
                 blog = new Blog(name, author, blogLink, feedLink, map);
                 blog.setLastUpdate(lastUpdate);

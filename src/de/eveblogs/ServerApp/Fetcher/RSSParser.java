@@ -16,14 +16,16 @@
  */
 package de.eveblogs.ServerApp.Fetcher;
 
+import de.eveblogs.ServerApp.EveBlogs;
 import de.eveblogs.ServerApp.Utilities.Blog;
 import de.eveblogs.ServerApp.Utilities.Blogpost;
 import java.net.MalformedURLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,13 +55,16 @@ public class RSSParser {
         this.blogList = blogList;
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.ENGLISH);
 
-        this.dateFormatPattern = new LinkedList<>();
 
         /*
-         * TODO test if there are cases that dont't use one of these formats. TODO add the DateFormat list to the propperties file.
+         * TODO test if there are cases that dont't use one of these formats. 
+         * TODO find a more elegant solution
          */
-        this.dateFormatPattern.add("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
-        this.dateFormatPattern.add("EEE, dd MMM yyyy HH:mm:ss Z");
+        this.dateFormatPattern = new LinkedList<>(Arrays.asList(EveBlogs.getDefaultConfig().getProperty("dateFormats").split("\", *")));
+        ListIterator<String> it = dateFormatPattern.listIterator();
+        while(it.hasNext()) {
+            it.set(it.next().replace("\"", ""));
+        }
     }
 
     /**
@@ -98,7 +103,9 @@ public class RSSParser {
 
                             /*
                              * TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a
-                             * loop in each case. TODO try to bring this in a bit nicer form.
+                             * loop in each case. 
+                             * TODO try to bring this in a bit nicer form.
+                             * TODO implement the parser for atom feeds. (element instead of item)
                              */
                             String elementContent = startElement.getName().toString();
                             if (elementContent.equals("item")) {

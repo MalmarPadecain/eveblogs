@@ -22,8 +22,10 @@ import de.eveblogs.ServerApp.Renderer.RSSRenderer;
 import de.eveblogs.ServerApp.Utilities.Blog;
 import de.eveblogs.ServerApp.Utilities.Blogpost;
 import de.eveblogs.ServerApp.Utilities.Configuration;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.logging.Level;
@@ -107,9 +109,18 @@ public class EveBlogs {
     }
 
     private static void createFeed() throws SQLException, IOException, XMLStreamException {
-        LinkedList<Blogpost> list = DBConnection.getDBCon().getLatestBlogposts(50);
-        RSSRenderer renderer = new RSSRenderer(list);
-        renderer.createFeed();
+        String[] outputSizeList = getDefaultConfig().getProperty("outputSizeList").split(", *"); // splits the comma seperated list in the properties file 
+        String outputLocation = getDefaultConfig().getProperty("targetLocation");
+        for(int i = 0; i < outputSizeList.length; i++) {
+            String fileName = outputLocation + File.separator;
+            if(i == 0) {
+                fileName += "feed.rss";
+            } else {
+                fileName += "feed" + Integer.toString(i) + ".rss";
+            }
+            LinkedList<Blogpost> list = DBConnection.getDBCon().getLatestBlogposts(Integer.parseInt(outputSizeList[i]));
+            RSSRenderer.createFeed(list, Paths.get(fileName));
+        }
     }
 
     /**

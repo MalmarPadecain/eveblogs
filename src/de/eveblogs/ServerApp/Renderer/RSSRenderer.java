@@ -25,7 +25,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventFactory;
@@ -39,30 +38,19 @@ import javax.xml.stream.XMLStreamException;
  */
 public class RSSRenderer {
 
-    private final LinkedList<Blogpost> blogpostList;
-    private final Path locationOfRSSHeader;
-    private final Path targetLocation;
-
-    /**
-     *
-     * @param list the list with the blogposts that will be writen to the feed.
-     */
-    public RSSRenderer(LinkedList<Blogpost> list) {
-        this.blogpostList = list;
-        this.locationOfRSSHeader = Paths.get(EveBlogs.getDefaultConfig().getProperty("locationOfRSSHeader"));
-        this.targetLocation = Paths.get(EveBlogs.getDefaultConfig().getProperty("targetLocation"));
-    }
-
     /**
      * Outputs the RSS feed to the location specified in the config.properties with the header specefied at the same location.
      *
+     * @param blogpostList
+     * @param targetLocation
      * @throws IOException in case the RSS Header could not be copied to the target location.
      * @throws XMLStreamException
      */
-    public void createFeed() throws IOException, XMLStreamException {
+    public static void createFeed(LinkedList<Blogpost> blogpostList, Path targetLocation) throws IOException, XMLStreamException {
         /*
          * copy header to output and append.
          */
+        Path locationOfRSSHeader = Paths.get(EveBlogs.getDefaultConfig().getProperty("locationOfRSSHeader"));
         Files.copy(locationOfRSSHeader, targetLocation, StandardCopyOption.REPLACE_EXISTING);
         XMLEventWriter writer = XMLOutputFactory.newFactory().createXMLEventWriter(new FileOutputStream(targetLocation.toFile(), true));
 
@@ -79,7 +67,7 @@ public class RSSRenderer {
         fileWriter.close();
     }
 
-    private void parseBlogpost(Blogpost blogpost, XMLEventWriter writer) throws XMLStreamException {
+    private static void parseBlogpost(Blogpost blogpost, XMLEventWriter writer) throws XMLStreamException {
         XMLEventFactory factory = XMLEventFactory.newFactory();
         writer.add(factory.createStartElement(new QName("item"), null, null));
 
