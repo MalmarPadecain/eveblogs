@@ -57,12 +57,11 @@ public class RSSParser {
 
 
         /*
-         * TODO test if there are cases that dont't use one of these formats. 
-         * TODO find a more elegant solution
+         * TODO test if there are cases that dont't use one of these formats. TODO find a more elegant solution
          */
         this.dateFormatPattern = new LinkedList<>(Arrays.asList(EveBlogs.getDefaultConfig().getProperty("dateFormats").split("\", *")));
         ListIterator<String> it = dateFormatPattern.listIterator();
-        while(it.hasNext()) {
+        while (it.hasNext()) {
             it.set(it.next().replace("\"", ""));
         }
     }
@@ -96,15 +95,13 @@ public class RSSParser {
                 loop: // labels the loop to jump out of it when no new blogposts are there to be parsed.
                 while (reader.hasNext()) {
                     XMLEvent event = reader.nextEvent();
-
                     switch (event.getEventType()) {
                         case XMLEvent.START_ELEMENT:
                             StartElement startElement = event.asStartElement();
 
                             /*
-                             * TODO in case of an escape sequence in a string the parser stops parsing and jumps to the next entry. Solve this probably with a
-                             * loop in each case. 
                              * TODO try to bring this in a bit nicer form.
+                             *
                              * TODO implement the parser for atom feeds. (element instead of item)
                              */
                             String elementContent = startElement.getName().toString();
@@ -112,7 +109,11 @@ public class RSSParser {
                                 itemFlag = true;
                             } else if (elementContent.equals(blog.getElementName("blogpostName"))) {
                                 if (itemFlag) {
-                                    name = reader.nextEvent().asCharacters().getData();
+                                    StringBuilder builder = new StringBuilder(255);
+                                    while (!reader.peek().isEndElement()) {
+                                        builder.append(reader.nextEvent().asCharacters().getData());
+                                    }
+                                    name = builder.toString();
                                 }
                             } else if (elementContent.equals(blog.getElementName("blogpostLink"))) {
                                 if (itemFlag) {
@@ -120,7 +121,12 @@ public class RSSParser {
                                 }
                             } else if (elementContent.equals(blog.getElementName("description"))) {
                                 if (itemFlag) {
-                                    description = reader.nextEvent().asCharacters().getData();
+                                    StringBuilder builder = new StringBuilder(255);
+                                    while (!reader.peek().isEndElement()) {
+                                        builder.append(reader.nextEvent().asCharacters().getData());
+                                    }
+//                                    description = reader.nextEvent().asCharacters().getData();
+                                    description = builder.toString();
                                 }
                             } else if (elementContent.equals(blog.getElementName("publicationDateTime"))) {
                                 /*
@@ -137,15 +143,15 @@ public class RSSParser {
                                         }
                                         break; // if parsing was successful break out
                                     }
-                                    
+
                                     /*
                                      * as soon as a date is parsed that is before the last update of the blog the rest of the file is skipped.
                                      */
-                                    if((pubDate != null) && (blog.getLastUpdate() != null) && pubDate.before(blog.getLastUpdate())) {
+                                    if ((pubDate != null) && (blog.getLastUpdate() != null) && pubDate.before(blog.getLastUpdate())) {
                                         blog.setLastUpdate(new Date());
                                         break loop;
                                     }
-                                    if(pubDate == null) {
+                                    if (pubDate == null) {
                                         pubDate = new Date();
                                         Logger.getLogger(RSSParser.class.getName()).log(Level.WARNING, "Blog {0} uses unsupported DateTime format", blog);
                                     }
@@ -184,7 +190,6 @@ public class RSSParser {
             } catch (XMLStreamException ex) {
                 Logger.getLogger(RSSParser.class.getName()).log(Level.SEVERE, null, ex);
             }
-
         }
         return blogpostList;
     }
